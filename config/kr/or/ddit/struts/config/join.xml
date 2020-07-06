@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<!-- 
+		http://localhost/StrutsToddler/user/join/loginForm.do
+		http://localhost/StrutsToddler/user/join/loginForm.do?message="회원이 아닙니다."
+	 -->
+	<package name="joinPKG" extends="struts-default" namespace="/user/join">
+		<action name="loginForm">
+			<result>/WEB-INF/views/user/join/loginForm.jsp</result>
+		</action>
+		<action name="loginCheck" class="kr.or.ddit.join.controller.LoginCheckAction">
+<!-- 		<result name="loginForm" type="redirectAction">
+				<param name="namespace">/user/join</param>  /user/join으로 선언되어있는 패키지에 접근
+				<param name="actionName">loginForm</param>
+				<param name="message">${message}</param>
+			</result> Action 에서 Action으로 리다이렉트 -->
+			<result name="loginForm" type="redirect">
+				<![CDATA[/user/join/loginForm.do?message=${message}]]>
+			</result>
+			<result name="success" type="chain"> <!-- Action 에서 Action으로 포워딩처리 -->
+				<param name="namespace">/user/member</param>
+				<param name="actionName">memberList</param>
+			</result>
+		</action>
+	</package>	
+</struts>

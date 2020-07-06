@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>StrutsToddler</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- 
+  	스트럿츠의 프론트엔드 컨트롤러 선언 : 스트러츠 프레임워크의 default url pattern의 확장자는 *.action
+  							 url pattern의 확장자 변경 시 설정 파일에서 설정 요구됨.
+        스트럿츠의 설정파일(xml) : (빌드 패스 | 클래스패스 루트) 하위에 존재.
+                                                 파일명이 반드시 - struts.xml 이어야 함.
+                                                 외부 설정파일 존재 - struts.properties  							     
+   -->
+   <filter>
+   		<filter-name>struts2</filter-name>
+   		<filter-class>org.apache.struts2.dispatcher.FilterDispatcher</filter-class> <!-- 프론트 엔트 컨트롤러 -->
+   </filter>
+   <filter-mapping>
+   		<filter-name>struts2</filter-name>
+   		<url-pattern>*.do</url-pattern>
+   </filter-mapping>
+   
+   
+   <listener> <!-- 리스너 등록 -->
+    	<listener-class>kr.or.ddit.listener.Log4jInitializeListener</listener-class>
+   </listener>
+   
+</web-app>
