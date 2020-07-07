@@ -31,4 +31,16 @@
     	<listener-class>kr.or.ddit.listener.Log4jInitializeListener</listener-class>
    </listener>
    
+   
+   
+   <!-- Teils 설정  -->
+    <context-param>
+    		<param-name>org.apache.tiles.impl.BasicTilesContainer.DEFINITIONS_CONFIG</param-name>
+    		<param-value>/WEB-INF/views/tiles/tiles-def.xml</param-value>
+    </context-param>
+    
+    <listener>
+    	<listener-class>org.apache.struts2.tiles.StrutsTilesListener</listener-class>
+    </listener>	
+    
 </web-app>

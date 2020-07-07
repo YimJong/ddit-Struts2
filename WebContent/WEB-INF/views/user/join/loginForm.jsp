@@ -30,6 +30,7 @@
 </script>
 </head>
 <body>
+공개키 값 : ${publicKeyMap['publicModulus'] } &nbsp;|&nbsp; ${publicKeyMap['publicExponent'] } 
 	<table width="770" border="0" align="center" cellpadding="0"
 		cellspacing="0" style="margin: 90px;">
 		<tr>
@@ -57,6 +58,11 @@
 								<tr>
 									<td><b>패스워드</b></td>
 									<td><input type="password" name="mem_pass" class="box" tabindex="3" height="18" /></td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<a href="${pageContext.request.contextPath }/user/member/memberForm.do">회원가입을 원하시나요?</a>
+									</td>
 								</tr>
 							</table>
 						</td>

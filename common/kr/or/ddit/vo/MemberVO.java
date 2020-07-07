@@ -1,5 +1,8 @@
 package kr.or.ddit.vo;
 
+import java.io.File;
+import java.util.List;
+
 public class MemberVO {
 	// SELECT 'String '||LOWER(COLUMN_NAME)||';'
 	// FROM USER_TAB_COLUMNS
@@ -24,6 +27,17 @@ public class MemberVO {
 	String mem_memorialday;
 	String mem_mileage;
 	String mem_delete;
+	// 전송되는 파일, 파일의 컨텐츠 타입, 파일 이름
+	// input type=file name=files
+	// 전송디는 파일(변수명 필드네임)
+	private List<File> files;
+	// 전송되는 파일 컨텐츠 타입
+	// 변수명명 규칙 : 필드네임 + ContentType
+	private List<String> filesContentType;
+	// 전송되는 파일 이름
+	// 변수명명 규칙 : 필드네임 + FileName
+	private List<String> filesFileName;
+	
 	
 	public String getMem_id() {
 		return mem_id;
@@ -112,6 +126,10 @@ public class MemberVO {
 	public String getMem_like() {
 		return mem_like;
 	}
+	
+	public void setFilesFileName(List<String> filesFileName) {
+		this.filesFileName = filesFileName;
+	}
 	public void setMem_like(String mem_like) {
 		this.mem_like = mem_like;
 	}
@@ -139,7 +157,21 @@ public class MemberVO {
 	public void setMem_delete(String mem_delete) {
 		this.mem_delete = mem_delete;
 	}
-	
+	public List<File> getFiles() {
+		return files;
+	}
+	public void setFiles(List<File> files) {
+		this.files = files;
+	}
+	public List<String> getFilesContentType() {
+		return filesContentType;
+	}
+	public void setFilesContentType(List<String> filesContentType) {
+		this.filesContentType = filesContentType;
+	}
+	public List<String> getFilesFileName() {
+		return filesFileName;
+	}
 	
 	
 }

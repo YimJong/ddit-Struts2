@@ -9,6 +9,37 @@
 		<action name="memberList" class="kr.or.ddit.member.controller.MemberListAction">
 			<result>/WEB-INF/views/user/member/memberList.jsp</result>
 		</action>
+		<action name="memberView" class="kr.or.ddit.member.controller.MemberViewAction"
+			method="memberView">
+			<result>/WEB-INF/views/user/member/memberView.jsp</result>
+		</action>
+		<action name="deleteMemberInfo" class="kr.or.ddit.member.controller.DeleteMemberAction">	
+			<result type="redirectAction">
+				<![CDATA[/user/join/loginForm.do?message=${message}]]>
+			</result>	
+		</action>
+		<action name="updateMemberInfo" class="kr.or.ddit.member.controller.UpdateMemberAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+				<param name="namesapce">/user/member</param>
+				<param name="actionName">memberList</param>
+			</result>
+		</action>
+		<action name="memberForm">
+			<result>/WEB-INF/views/user/member/memberForm.jsp</result>
+		</action>
+		<action name="insertMemberInfo" class="kr.or.ddit.member.controller.InsertMemberAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="redirectAction">
+				<param name="namespace">/user/join</param>
+				<param name="actionName">loginForm</param>
+				<param name="message">${message}</param>
+			</result>
+		</action>
+		<action name="idCheck" class="kr.or.ddit.member.controller.IDCheckAction">
+		</action>
 	</package>
 	
 </struts>
