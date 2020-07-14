@@ -1,0 +1,58 @@
+package kr.or.ddit.user.qnaboard.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.fileupload.FileItem;
+
+import kr.or.ddit.ibatis.factory.SqlMapClientFactory;
+import kr.or.ddit.vo.BoardVO;
+import kr.or.ddit.vo.FileItemVO;
+
+import com.ibatis.sqlmap.client.SqlMapClient;
+
+public class QnaboardDaoImpl implements IQnaboardDao {
+
+	private static IQnaboardDao dao;
+	private SqlMapClient client;
+	
+	private QnaboardDaoImpl() {
+		client = SqlMapClientFactory.getSqlMapClient();
+	}
+	
+	public static IQnaboardDao getInstance() {
+		return dao == null ? dao = new QnaboardDaoImpl() : dao;
+	}
+
+	@Override
+	public String totalCount(Map<String, String> params) throws Exception {
+		return (String) client.queryForObject("qnaboard.totalCount", params);
+	}
+
+	@Override
+	public List<BoardVO> qnaboardList(Map<String, String> params)
+			throws Exception {
+		return client.queryForList("qnaboard.qnaboardList", params);
+	}
+
+	@Override
+	public String insertQnaboard(BoardVO boardInfo, FileItem[] items)
+			throws Exception {
+		return (String) client.insert("qnaboard.insertQnaboard", boardInfo);
+	}
+
+	@Override
+	public void insertFileitem(List<FileItemVO> fileitemList) throws Exception {
+		
+		try {
+			client.startTransaction();
+			
+			for(int i = 0; i < fileitemList.size(); i++) {
+				client.insert("qnaFileitem.insertFile", fileitemList.get(i));
+			}
+			client.commitTransaction();
+		} finally {
+			client.endTransaction();
+		}
+	}
+}

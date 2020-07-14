@@ -1,0 +1,51 @@
+package kr.or.ddit.user.noticeboard.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import kr.or.ddit.user.noticeboard.service.INoticeboardService;
+import kr.or.ddit.user.noticeboard.service.NoticeboardServiceImpl;
+import kr.or.ddit.vo.BoardVO;
+
+public class NoticeboardViewAction {
+	private String board_no;
+	private String rnum;
+	private BoardVO boardInfo;
+	
+	public String execute() throws Exception {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("board_no", this.board_no);
+		
+		INoticeboardService service = NoticeboardServiceImpl.getInstance();
+		this.boardInfo = service.boardInfo(params);
+		service.plusHit(this.board_no);
+		
+		return "success";
+	}
+	
+	public BoardVO getBoardInfo() {
+		return boardInfo;
+	}
+
+	public void setBoard_no(String board_no) {
+		this.board_no = board_no;
+	}
+	
+	public String getRnum() {
+		return rnum;
+	}
+
+	public void setRnum(String rnum) {
+		this.rnum = rnum;
+	}
+
+	public String getBoard_no() {
+		return board_no;
+	}
+
+
+
+		
+}
+
+

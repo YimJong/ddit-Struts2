@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<!-- 
+	http://localhost/StrutsToddler/user/join/loginForm.do
+	http://localhost/StrutsToddler/user/join/loginForm.do?message='회원이아닙니다'
+ -->
+<struts>
+	
+	<package name="joinPKG" extends="abstractPKG" namespace="/user/join">
+		<action name = "loginForm">
+			<interceptor-ref name="cryptoInterceptor"></interceptor-ref>
+			<result>/WEB-INF/views/user/join/loginForm.jsp</result>
+		</action>
+		
+		<action name="loginCheck" class="kr.or.ddit.join.controller.LoginCheckAction">
+			<!--  
+			<result name="loginForm" type="redirectAction">
+				<param name="namespace">/user/join</param>
+				<param name="actionName">loginForm</param>
+				<param name="message">${message}</param>
+			</result> action에서 Action으로 리다이렉트 
+			-->
+			
+			<result name="loginForm" type="redirect">
+				<![CDATA[/user/join/loginForm.do?message=${message}]]>
+			</result>
+			<!-- 포워드 처리로도 가능 
+				message만 주기 때문에 리다이렉트 처리하는 것이 더 간편하다  -->
+			
+			<result name ="success" type="chain">
+				<param name ="namespace">/user/noticeboard</param>
+				<param name = "actionName">noticeboardList</param>
+			</result>
+		</action>
+		
+		<action name="logout" class="kr.or.ddit.join.controller.LogoutAction">
+			<result name="success" type="redirect">
+				<![CDATA[/user/join/loginForm.do?message=${message}]]>
+			</result>
+		</action>
+	</package>
+		
+
+</struts>

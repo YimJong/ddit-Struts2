@@ -1,0 +1,31 @@
+package kr.or.ddit.admin.question.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.vo.BoardVO;
+
+public interface IQuestionDao {
+
+	
+	/*자주하는 질문 등록*/
+	public String insertQuestion(BoardVO insertQuestion) throws Exception;
+
+    /*자주하는 질문 전체 목록*/
+    public List<BoardVO> getQuestionAll(Map<String, String> params) throws Exception;
+
+    /*자주하는 질문 삭제*/
+    public void deleteQuestion(BoardVO deleteQuestion) throws Exception;
+
+    /*자주하는 질문 수정*/
+    public void modifyQuestion(BoardVO boardVO) throws Exception;
+
+    /*자주하는 질문 검색*/
+    public List<BoardVO> searchConditionByQuesboard(BoardVO boardVO) throws Exception;
+    
+    /*자주하는 질문 상세글 출력*/
+    public BoardVO onlyQuestion(Map<String, String> params) throws Exception;
+    
+    public String totalCount(Map<String, String> params) throws Exception;
+
+}

@@ -1,0 +1,127 @@
+package kr.or.ddit.admin.qnaboard.controller;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import kr.or.ddit.global.GlobalConstant;
+import kr.or.ddit.user.qnaboard.service.IQnaboardService;
+import kr.or.ddit.user.qnaboard.service.QnaboardServiceImpl;
+import kr.or.ddit.vo.BoardVO;
+import kr.or.ddit.vo.FileItemVO;
+
+import org.apache.commons.io.FileUtils;
+
+import com.opensymphony.xwork2.Action;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class InsertReplyQnaboard implements Action, ModelDriven<BoardVO> {
+	private BoardVO boardInfo;
+	private String fileName;
+	private String insertMessage;
+	
+	@Override
+	public String execute() throws Exception {
+		IQnaboardService service = QnaboardServiceImpl.getInstance();
+		
+		List<File> files = this.boardInfo.getFiles();
+		List<String> contentType = this.boardInfo.getFilesContentType(); 
+		List<String> fileNames = this.boardInfo.getFilesFileName(); 
+		
+		
+		// 파일 업로드
+		String file_save_name = "";
+		if(files != null) {
+			List<FileItemVO> fileList = new ArrayList<>();
+			for(int i=0; i<files.size(); i++){
+				File targetFile = files.get(i);
+				String[] fullNameArr = fileNames.get(i).split("[.]", 2);
+				if(targetFile.length() >0){
+					String genID = UUID.randomUUID().toString().replace("-", "");
+					file_save_name = fullNameArr[0] + genID + "." + fullNameArr[1];
+					File saveFile = new File(GlobalConstant.FILE_PATH, 
+														 file_save_name);
+					FileUtils.copyFile(targetFile, saveFile);
+					this.fileName = fileNames.get(i);
+					
+					FileItemVO fileInfo = new FileItemVO();
+					fileInfo.setFile_type(contentType.get(i));
+					fileInfo.setFile_save_name(file_save_name);
+					fileInfo.setFile_name(fileNames.get(i));
+					
+					fileList.add(fileInfo);
+				}
+			}
+			service.insertAdminQnaReply(boardInfo, fileList);
+			insertMessage = "댓글이 등록되었습니다.";
+		}
+		return SUCCESS;
+	}
+
+	
+	@Override
+	public BoardVO getModel() {
+		this.boardInfo = new BoardVO();
+		return this.boardInfo;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getInsertMessage() {
+		return insertMessage;
+	}
+	
+	
+	private String contentDisposition;
+	private long contentLength;
+	private InputStream inputStream;
+	
+	public String getContentDisposition() {
+		return contentDisposition;
+	}
+
+	public void setContentDisposition(String contentDisposition) {
+		this.contentDisposition = contentDisposition;
+	}
+
+	public long getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(long contentLength) {
+		this.contentLength = contentLength;
+	}
+
+	public InputStream getInputStream() {
+		return inputStream;
+	}
+
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+	
+	public String fileDownload(){
+		File downloadFile = new File(GlobalConstant.FILE_PATH, 
+										 this.fileName);
+		this.contentDisposition = "attachment;fileName=" + this.fileName;
+		this.contentLength = downloadFile.length();
+		
+		try {
+			this.inputStream = new FileInputStream(downloadFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return "success";
+	}
+}

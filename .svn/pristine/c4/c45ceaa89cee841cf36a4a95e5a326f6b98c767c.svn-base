@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="referenceRoomPKG" extends="struts-default, tiles-default" namespace="/user/referenceRoom">
+		<action name="referenceRoomList" class="kr.or.ddit.user.referenceRoom.controller.ReferenceRoomListAction">
+			<result type="tiles">user/referenceRoom/referenceRoomList</result>
+		</action>
+	</package>
+</struts>    

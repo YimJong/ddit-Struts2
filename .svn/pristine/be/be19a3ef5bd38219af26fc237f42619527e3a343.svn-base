@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="adminQnaPKG" extends="struts-default, tiles-default" namespace="/admin/qna">
+	
+		<action name="qnaboardList" class="kr.or.ddit.admin.qnaboard.controller.QnaListAction">
+			<result type="tiles">admin/qnaboard/qnaboardList</result>
+		</action>
+		
+		
+		
+		<!-- <action name="qnaboardForm">
+			<result type="tiles">user/qnaboard/qnaboardForm</result>
+		</action>
+		
+		<action name="insertQnaboard" class="kr.or.ddit.user.qnaboard.controller.InsertQnaboardAction">
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+				<param name="namespace">/user/qna</param>
+				<param name="actionName">qnaboardList</param>
+			</result>
+		</action>
+		
+		<action name="qnaboardView" class="kr.or.ddit.user.qnaboard.controller.QnaViewAction">
+			<result type="tiles">user/qnaboard/qnaboardView</result>
+		</action>
+		
+		<action name="updateQnaboard" class="kr.or.ddit.user.qnaboard.controller.UpdateQnaboardAction">
+			<result type="chain">
+				<param name="namespace">/user/qna</param>
+				<param name="actionName">qnaboardList</param>
+			</result>
+		</action>
+		
+		<action name="deleteQnaboard" class="kr.or.ddit.user.qnaboard.controller.DeleteQnaboardAction">
+			<result type="chain">
+				<param name="namespace">/user/qna</param>
+				<param name="actionName">qnaboardList</param>
+			</result>
+		</action>
+		
+		<action name="plusHit" class="kr.or.ddit.user.qnaboard.controller.QnaboardHitPlusAction">
+		
+		</action>
+		
+		<action name="downloadQnaFileitem" class="kr.or.ddit.user.qnaboard.controller.InsertQnaboardAction"
+			method="fileDownload">
+			<result type="stream">
+				<param name="contentType">binary/octet-stream</param>
+				<param name="inputName">inputStream</param>
+				<param name="contentDisposition">${contentDisposition}</param>
+				<param name="contentLength">${contentLength}</param>
+				<param name="bufferSize">4096</param>
+			</result>
+		</action>
+	
+		<action name="replyQnaboard" class="kr.or.ddit.user.qnaboard.controller.ReplyQnaboard">
+			<result type="tiles">user/qnaboard/qnaboardReplyForm</result>
+		</action>
+		
+		<action name="insertQnaboardReply" class="kr.or.ddit.user.qnaboard.controller.InsertReplyQnaboard">
+			<result type="chain">
+				<param name="namespace">/user/qna</param>
+				<param name="actionName">qnaboardList</param>
+			</result>
+		</action> -->
+	</package>
+</struts>

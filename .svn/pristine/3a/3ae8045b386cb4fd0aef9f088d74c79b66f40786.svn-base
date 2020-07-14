@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="questionPKG" extends="struts-default, tiles-default" namespace="/user/question">
+		<action name="questionList" class="kr.or.ddit.user.question.controller.QuestionListAction">
+			<result type="tiles">user/question/questionList</result>
+		</action>
+	</package>
+</struts>        
+   

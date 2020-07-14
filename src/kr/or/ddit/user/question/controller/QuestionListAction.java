@@ -1,0 +1,135 @@
+package kr.or.ddit.user.question.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import kr.or.ddit.utiles.RolePaginationUtil;
+import kr.or.ddit.user.question.service.IQuestionService;
+import kr.or.ddit.user.question.service.QuestionServiceImpl;
+import kr.or.ddit.vo.BoardVO;
+
+import org.apache.struts2.ServletActionContext;
+
+import com.opensymphony.xwork2.Action;
+
+public class QuestionListAction implements Action{
+	
+	private List<BoardVO> questionList;
+	private String currentPage;
+	private String search_keyword;
+	private String search_keycode;
+	private IQuestionService service;
+	private String pagingHtml;
+	private String updateMessage;
+	private String insertMessage;
+	private String deleteMessage;
+	
+	
+	
+	public String getSearch_keyword() {
+		return search_keyword;
+	}
+
+	public String getSearch_keycode() {
+		return search_keycode;
+	}
+
+	public void setQuestionList(List<BoardVO> questionList) {
+		this.questionList = questionList;
+	}
+
+	public String getUpdateMessage() {
+		return updateMessage;
+	}
+
+	public void setUpdateMessage(String updateMessage) {
+		this.updateMessage = updateMessage;
+	}
+
+	public String getInsertMessage() {
+		return insertMessage;
+	}
+
+	public void setInsertMessage(String insertMessage) {
+		this.insertMessage = insertMessage;
+	}
+
+	public String getDeleteMessage() {
+		return deleteMessage;
+	}
+
+	public void setDeleteMessage(String deleteMessage) {
+		this.deleteMessage = deleteMessage;
+	}
+
+	public QuestionListAction(){
+		service = QuestionServiceImpl.getInstance();
+	}
+
+	@Override
+	public String execute() throws Exception {
+		
+		HttpServletRequest request  = ServletActionContext.getRequest();
+	    HttpSession session = request.getSession();
+	      
+	      // 헤더 이름 변경..
+	    session.setAttribute("smallHeader", "자주하는 질문");
+		session.setAttribute("headerURI", request.getContextPath() + "/user/question/questionList.do");
+		 session.setAttribute("smallName", "목록");
+	      
+	      
+		if(currentPage == null){
+			this.currentPage = "1";
+		}
+		
+		Map<String , String> params = new HashMap<String,String>();
+		params.put("search_keyword", this.search_keyword);
+		params.put("search_keycode", this.search_keycode);
+		
+		String totalCount = service.totalCount(params);
+		
+		RolePaginationUtil pagination = new RolePaginationUtil(request, 
+																Integer.parseInt(currentPage),
+																Integer.parseInt(totalCount),
+																"/user/question/questionList.do",
+																this.search_keyword,
+																this.search_keycode);
+		
+		params.put("startCount", String.valueOf(pagination.getStartCount()) );
+		params.put("endCount", String.valueOf(pagination.getEndCount()) );
+		
+		this.pagingHtml = pagination.getPagingHtmls();
+		this.questionList = service.questionList(params);
+		
+		return SUCCESS;
+	}
+
+	public List<BoardVO> getQuestionList() {
+		return questionList;
+	}
+
+	public String getPagingHtml() {
+		return pagingHtml;
+	}
+
+	public void setCurrentPage(String currentPage) {
+		this.currentPage = currentPage;
+	}
+
+	public void setSearch_keyword(String search_keyword) {
+		this.search_keyword = search_keyword;
+	}
+
+	public void setSearch_keycode(String search_keycode) {
+		this.search_keycode = search_keycode;
+	}
+
+	public String getCurrentPage() {
+		return currentPage;
+	}
+
+}

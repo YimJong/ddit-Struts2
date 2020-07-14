@@ -1,0 +1,14 @@
+package kr.or.ddit.user.qnaboard.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.vo.BoardVO;
+
+public interface IQnaboardService {
+
+	public String totalCount(Map<String, String> params);
+	
+	public List<BoardVO> qnaboardList(Map<String, String> params);
+	
+}

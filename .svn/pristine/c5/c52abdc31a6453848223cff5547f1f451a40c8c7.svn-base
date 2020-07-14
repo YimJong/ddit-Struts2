@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace = "question">
+    <typeAlias alias="boardVO" type="kr.or.ddit.vo.BoardVO"/>
+    
+   <sql id="AllQuestionList">
+    		select * 
+			from board
+			where board_index = '6'
+			and board_delete = 'n'
+    </sql>
+    	
+    <sql id="searchConditionByQuesboard">
+      <dynamic prepend="AND">
+         <isNotEmpty property="search_keyword" open="(" close=")">
+            <isEqual property="search_keycode" compareValue="TOTAL">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+               OR BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+               OR BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+               OR BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="TITLE">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="CONTENT">
+               BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NICKNAME">
+               BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="WRITER">
+               BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NAME">
+               MEM_NAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+         </isNotEmpty>
+      </dynamic>
+   </sql>
+    	
+    	
+        
+     <select id="questionList" resultClass="boardVO" parameterClass="map">
+      SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="AllQuestionList"/>   
+                  <include refid="searchConditionByQuesboard"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+      ORDER BY B.RNUM DESC
+   </select>   
+    	
+    </sqlMap>

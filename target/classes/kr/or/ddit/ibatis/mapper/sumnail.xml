@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace = "sumnail">
+		<typeAlias alias="boardVO" type="kr.or.ddit.vo.BoardVO"/>
+		<typeAlias alias="boardFileVO" type="kr.or.ddit.vo.BoardFileVO"/>
+		
+	<sql id="selectAllFreeboard">
+      SELECT *
+       FROM BOARD, MEMBER
+      WHERE BOARD_DELETE = 'n' 
+      AND BOARD_INDEX = 5
+      AND BOARD.BOARD_WRITER = MEMBER.MEM_ID
+   </sql>
+   
+   <sql id="searchConditionByboard">
+      <dynamic prepend="AND">
+         <isNotEmpty property="search_keyword" open="(" close=")">
+            <isEqual property="search_keycode" compareValue="TOTAL">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+               OR BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+               OR BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="TITLE">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="CONTENT">
+               BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="WRITER">
+               BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+         </isNotEmpty>
+      </dynamic>
+   </sql>
+   
+   
+    <select id="freeboardList" resultClass="boardFileVO" parameterClass="map">
+      <!-- 
+      SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="selectAllFreeboard"/>   
+                  <include refid="searchConditionByboard"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+      ORDER BY B.RNUM DESC 
+      -->
+      
+		SELECT B.*
+		FROM(
+		SELECT A.*, ROWNUM RNUM
+		FROM 
+		(SELECT BOARD.BOARD_NO, BOARD.BOARD_TITLE, BOARD.BOARD_DEPTH, BOARD.BOARD_WRITER, BOARD.BOARD_REG_DATE, BOARD.BOARD_HIT, FILEITEM.FILE_SAVE_NAME
+		FROM BOARD, FILEITEM      
+		WHERE BOARD.BOARD_INDEX = 5
+		AND BOARD.BOARD_NO = FILEITEM.BOARD_NO
+		AND BOARD_DELETE='n'
+		<include refid="searchConditionByboard"/>
+		ORDER BY BOARD.BOARD_GROUP, BOARD.BOARD_SEQ DESC)A)B
+		<![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+      ORDER BY B.RNUM DESC 
+   </select>   
+   
+    <select id="totalCounting" parameterClass="map" resultClass="String">
+      SELECT count(*)  
+		FROM BOARD, FILEITEM         
+		WHERE BOARD.BOARD_INDEX = 5   
+		AND BOARD.BOARD_NO = FILEITEM.BOARD_NO   
+		AND BOARD_DELETE='n'     
+      <include refid="searchConditionByboard"/>
+   </select>
+   
+   
+    <resultMap class="boardVO" id="freebaordResultMap">
+      <result property="board_no" column="board_no" />
+      <result property="board_title" column="board_title" />
+      <result property="board_index" column="board_index" />
+      <result property="board_writer" column="board_writer" />
+      <result property="board_nickname" column="board_nickname" />
+      <result property="board_content" column="board_content" />
+      <result property="board_hit" column="board_hit" />
+      <result property="board_delete" column="board_delete" />
+      <result property="board_group" column="board_group" />
+      <result property="board_seq" column="board_seq" />
+      <result property="board_depth" column="board_depth" />
+   
+      <result property="items" column="board_no" select="fileItem.fileitemList"></result>
+   
+   </resultMap>
+   
+   
+   <select id="freeboardInfo" resultMap="freebaordResultMap" parameterClass="map">
+      <include refid="selectAllFreeboard"/>   
+      AND BOARD_NO=#board_no#
+   </select>
+  
+  
+  <insert id="insertFreeboard" parameterClass="boardVO">
+      <selectKey keyProperty="board_no" resultClass="String">
+         SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO BOARD(BOARD_NO
+                     ,BOARD_NICKNAME
+                     ,BOARD_TITLE
+                     ,BOARD_CONTENT
+                     ,BOARD_WRITER
+                     ,BOARD_INDEX
+                     ,BOARD_GROUP
+                  )
+               VALUES(#board_no#
+                     ,#board_nickname#
+                     ,#board_title#
+                     ,#board_content#
+                     ,#board_writer#
+                     ,'5'
+                     ,#board_no#
+                     )
+      
+   </insert>
+   
+   
+   <update id="updateBoardInfo" parameterClass="boardVO">
+   		UPDATE BOARD
+     	SET BOARD_TITLE=#board_title#,
+        BOARD_CONTENT=#board_content#
+        WHERE BOARD_NO=#board_no#
+   </update>
+   
+   <update id="deleteFreeboard" parameterClass="boardVO">
+  	  UPDATE BOARD
+      SET BOARD_DELETE='y'
+      WHERE BOARD_NO=#board_no#
+   </update>
+   
+   
+   <insert id="replyFreeboard" parameterClass="boardVO">
+	   <selectKey keyProperty="board_no" resultClass="String">
+				SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+			</selectKey>
+			INSERT INTO 
+				BOARD(
+					 BOARD_NO       
+					,BOARD_TITLE    
+					,BOARD_WRITER   
+					,BOARD_NICKNAME 
+					,BOARD_CONTENT  
+					,BOARD_GROUP  
+					,BOARD_SEQ
+					,BOARD_DEPTH
+					,BOARD_INDEX
+					  
+				)
+				VALUES(
+					 #board_no#
+					,#board_title#
+					,#board_writer#
+					,#board_nickname#
+					,#board_content#
+					,#board_group#
+					,#board_seq#
+					,#board_depth#
+					,5
+					)
+   </insert>
+   
+   
+   <select id="incrementSeqbyFreeboard" parameterClass="boardVO" resultClass="string">
+		SELECT MAX(BOARD_SEQ) + 1
+			FROM BOARD
+		  WHERE BOARD_GROUP = #board_group#
+	</select>
+	
+	<update id="updateSeqbyFreeboard" parameterClass="boardVO">
+		UPDATE BOARD
+			SET BOARD_SEQ = BOARD_SEQ + 1
+		  WHERE BOARD_GROUP = #board_group#
+		  	AND BOARD_SEQ > #board_seq#	
+	</update>
+	
+	
+	<select id="searchFile" parameterClass="String" resultClass="String">
+		SELECT FILE_SAVE_NAME
+		FROM FILEITEM
+		WHERE BOARD_NO = #board_no#
+	</select>
+	
+	
+	<update id="updateCountNo" parameterClass="boardVO">
+		UPDATE BOARD
+			SET BOARD_HIT = BOARD_HIT + 1
+		  WHERE BOARD_NO = #board_no#
+	</update>
+</sqlMap>

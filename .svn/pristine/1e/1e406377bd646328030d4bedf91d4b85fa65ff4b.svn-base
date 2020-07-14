@@ -1,0 +1,45 @@
+package kr.or.ddit.user.referenceRoom.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import kr.or.ddit.user.referenceRoom.service.IReferenceRoomService;
+import kr.or.ddit.user.referenceRoom.service.ReferenceRoomServiceImpl;
+import kr.or.ddit.vo.BoardVO;
+
+import com.opensymphony.xwork2.Action;
+
+public class ReferenceRoomViewAction implements Action {
+	private String board_no;
+	private String rnum;
+	private BoardVO referenceInfo;
+	
+	public String execute(){
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("board_no", this.board_no);
+		
+		IReferenceRoomService service = ReferenceRoomServiceImpl.getInstance();
+		this.referenceInfo = service.boardInfo(params);
+		
+		return "success";
+		
+		
+	}
+
+	public void setBoard_no(String board_no) {
+		this.board_no = board_no;
+	}
+
+	public void setRnum(String rnum) {
+		this.rnum = rnum;
+	}
+
+	public String getBoard_no() {
+		return board_no;
+	}
+
+
+
+
+}

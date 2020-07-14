@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="noticeboardPKG" extends="abstractPKG" namespace="/user/noticeboard">
+		<action name = "noticeboardList" class="kr.or.ddit.user.noticeboard.controller.NoticeboardListAction">
+			<interceptor-ref name="cryptoInterceptor"></interceptor-ref>
+			<result type="tiles">user/noticeboard/noticeboardList</result>
+		</action>
+		
+		<action name = "noticeboardView" class="kr.or.ddit.user.noticeboard.controller.NoticeboardViewAction" >
+			<result type="tiles">user/noticeboard/noticeboardView</result>
+		</action>
+	</package>
+	
+	<package name="noticeboardAdminPKG" extends="struts-default,tiles-default" namespace="/admin/noticeboard">
+		<action name="noticeboardForm">
+			<result type="tiles">admin/noticeboard/noticeboardForm</result>
+		</action>
+		
+		<action name = "noticeboardList" class="kr.or.ddit.admin.noticeboard.controller.NoticeboardListAction">
+			<result type="tiles">admin/noticeboard/noticeboardList</result>
+		</action>
+		
+		<action name = "noticeboardView" class="kr.or.ddit.admin.noticeboard.controller.NoticeboardViewAction" >
+			<result type="tiles">admin/noticeboard/noticeboardView</result>
+		</action>
+		
+		<action name = "updateNoticeboardInfo" class="kr.or.ddit.admin.noticeboard.controller.UpdateNoticeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+					<param name="namespace">/admin/noticeboard</param>
+					<param name="actionName">noticeboardList</param>
+			</result>
+		</action>
+		
+		<action name = "deleteNoticeboardInfo" class="kr.or.ddit.admin.noticeboard.controller.DeleteNoticeboardAction">
+			<result type="chain">
+					<param name="namespace">/admin/noticeboard</param>
+					<param name="actionName">noticeboardList</param>
+			</result>
+		</action>
+	</package>
+	
+	
+</struts>
+

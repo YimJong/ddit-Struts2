@@ -1,0 +1,74 @@
+package kr.or.ddit.utiles;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import kr.or.ddit.global.GlobalConstant;
+import kr.or.ddit.vo.BoardVO;
+import kr.or.ddit.vo.FileItemVO;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
+public class AttachFileMapper {
+	public static List<FileItemVO> mapper(BoardVO freeboardInfo) {
+		String fileName = "";
+		List<FileItemVO> fileItemList = new ArrayList<FileItemVO>();
+		
+		if(freeboardInfo.getFiles() != null) {
+			FileItemVO fileItemInfo = null;
+			
+			 List<File> files = freeboardInfo.getFiles();
+	         List<String> contentType = freeboardInfo.getFilesContentType();
+	         List<String> fileNames = freeboardInfo.getFilesFileName();
+	         
+			for(int i=0; i<files.size(); i++) {
+				fileItemInfo = new FileItemVO();
+				
+				File targetFile = files.get(i);
+				
+				if(targetFile.length() > 0){
+					fileName = fileNames.get(i);
+		            fileItemInfo.setFile_name(fileName);
+
+					// 파일 실제 저장소 : D:\\temp\\files
+					// 저장용 파일명을 별도로 작성
+					// a.png => a
+					String baseName = FilenameUtils.getBaseName(fileName);
+					// a.png => png
+					String extension = FilenameUtils.getExtension(fileName);
+					//  |--------유니크한 랜덤값---------|
+					// a93450923758903247584238953489.png
+					// UUID(Universally  Unique Identifier) = 128bit 유일값 생성('='포함)
+					String genID = UUID.randomUUID().toString().replace("-", "");
+					
+					String saveFileName = baseName + genID + "." + extension;
+					
+					fileItemInfo.setFile_save_name(saveFileName);
+					
+					fileItemInfo.setFile_type(contentType.get(i));  // 컨텐츠 타입
+					
+					fileItemInfo.setBoard_no(freeboardInfo.getBoard_no());
+					
+					fileItemList.add(fileItemInfo);
+					
+					saveFile(saveFileName, targetFile);  
+				}
+			}
+		}
+		return fileItemList;
+	}
+
+	private static void saveFile(String saveFileName, File targetfile) { // 파일 저장?
+		File saveFile = new File(GlobalConstant.FILE_PATH, saveFileName);
+		
+		try {
+			  FileUtils.copyFile(targetfile, saveFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

@@ -1,0 +1,11 @@
+package kr.or.ddit.user.question.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.vo.BoardVO;
+
+public interface IQuestionDao {
+
+	public List<BoardVO> questionList(Map<String, String> params);
+}

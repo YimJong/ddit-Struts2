@@ -1,0 +1,109 @@
+package kr.or.ddit.user.qnaboard.controller;
+
+import java.io.File;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.print.URIException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
+import org.apache.struts2.ServletActionContext;
+import org.apache.tomcat.jni.FileInfo;
+
+import kr.or.ddir.utiles.AttachFileMapper;
+import kr.or.ddir.utiles.FileUploadRequestWrapper;
+import kr.or.ddit.global.GlobalConstant;
+import kr.or.ddit.user.qnaboard.service.IQnaboardService;
+import kr.or.ddit.user.qnaboard.service.QnaboardServiceImpl;
+import kr.or.ddit.vo.BoardVO;
+import kr.or.ddit.vo.FileItemVO;
+
+import com.opensymphony.xwork2.Action;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class InsertQnaboardAction implements Action, ModelDriven<BoardVO> {
+
+	private BoardVO boardInfo;
+	private String fileName;
+	private String insertMessage;
+	
+	@Override
+	public String execute() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		FileUploadRequestWrapper wrapper = new FileUploadRequestWrapper(request);
+		
+		IQnaboardService service = QnaboardServiceImpl.getInstance();
+		
+		List<File> files = this.boardInfo.getFiles();
+		List<String> contentType = this.boardInfo.getFilesContentType(); 
+		List<String> fileNames = this.boardInfo.getFilesFileName(); 
+		
+		
+		// 파일 업로드
+		String file_save_name = "";
+<<<<<<< .mine
+		for(int i=0; i <files.size(); i++){
+			File targetFile = files.get(i);
+			if(targetFile.length() > 0){
+				String[] fileName = fileNames.get(i).split(".");
+				String genID = UUID.randomUUID().toString().replace("-", "");
+				file_save_name = fileName[0] + genID + fileName[1];
+				File saveFile = new File(GlobalConstant.FILE_PATH, 
+													 file_save_name);
+				FileUtils.copyFile(targetFile, saveFile);
+				this.fileName = fileNames.get(i);
+=======
+		if(files != null) {
+			List<FileItemVO> fileList = new ArrayList<>();
+			for(int i=0; i<files.size(); i++){
+				File targetFile = files.get(i);
+				String[] fullNameArr = fileNames.get(i).split("[.]", 2);
+				if(targetFile.length() >0){
+					String genID = UUID.randomUUID().toString().replace("-", "");
+					file_save_name = fullNameArr[0] + genID + "." + fullNameArr[1];
+					File saveFile = new File(GlobalConstant.FILE_PATH, 
+														 file_save_name);
+					FileUtils.copyFile(targetFile, saveFile);
+					this.fileName = fileNames.get(i);
+					
+					FileItemVO fileInfo = new FileItemVO();
+					fileInfo.setFile_type(contentType.get(i));
+					fileInfo.setFile_save_name(file_save_name);
+					fileInfo.setFile_name(fileNames.get(i));
+					
+					fileList.add(fileInfo);
+				}
+>>>>>>> .r786
+			}
+			service.insertQnaboard(boardInfo, fileList);
+			insertMessage = URLEncoder.encode("게시글이 등록되었습니다.", "UTF-8");
+		}
+		return SUCCESS;
+	}
+
+	
+	
+	@Override
+	public BoardVO getModel() {
+		this.boardInfo = new BoardVO();
+		
+		return this.boardInfo;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getInsertMessage() {
+		return insertMessage;
+	}
+
+}

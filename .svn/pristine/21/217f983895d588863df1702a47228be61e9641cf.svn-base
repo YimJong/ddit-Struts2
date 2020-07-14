@@ -1,0 +1,850 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap     
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="noticeboard">
+	<typeAlias alias="boardVO" type="kr.or.ddit.vo.BoardVO"/>
+	<typeAlias alias="fileVO" type="kr.or.ddit.vo.FileItemVO"/>
+	
+	<sql id="searchCondition">
+		 <dynamic prepend="AND">
+         <isNotEmpty property="search_keyword" open="(" close=")">
+            <isEqual property="search_keycode" compareValue="TOTAL">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+               OR BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+               OR BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+               OR BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="TITLE">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="CONTENT">
+               BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NICKNAME">
+               BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="WRITER">
+               BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NAME">
+               MEM_NAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+         </isNotEmpty>
+      </dynamic>
+	</sql>
+
+<!-- 공용 게시판 (동미 쓰고 있음)  -->
+	<sql id="selectBoardAll">
+		SELECT *
+		FROM BOARD
+		WHERE BOARD_DELETE = 'n'
+	</sql>
+	
+	<sql id="searchBoardCondition">
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword" open="(" close=")">
+				<isEqual property="search_keycode" compareValue="TOTAL">
+					BOARD_TITLE LIKE '%'||#search_keyword#||'%'
+					OR BOARD_CONTENT LIKE '%'||#search_keyword#||'%'
+					OR BOARD_NICKNAME LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="TITLE">
+					BOARD_TITLE LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="CONTENT">
+					BOARD_CONTENT LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="NICKNAME">
+					BOARD_NICKNAME LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<resultMap id="boardResultMap" class="boardVO">
+			<result property = "board_no"		 column="board_no" />
+            <result property = "board_title"	 column="board_title" />
+            <result property = "board_writer"	 column="board_writer" />
+            <result property = "board_nickname" column="board_nickname" />
+            <result property = "board_content"	 column="board_content" />
+            <result property = "board_hit"	 	 column="board_hit" />
+            <result property = "board_reg_date" column="board_reg_date" />
+            <result property = "board_delete"	 column="board_delete" />
+            <result property = "board_group"	 column="board_group" />
+            <result property = "board_seq"		 column="board_seq" />
+            <result property = "board_depth"	 column="board_depth" />
+            <result property = "items" column="board_no" select="fileItem.datafileitemList"/>
+		</resultMap>
+
+	<!-- 종원 -->
+	<select id="imageboardList" resultClass="boardVO"> 
+		 SELECT B.*
+		   FROM (SELECT ROWNUM RNUM, A.*
+			       FROM ( SELECT *
+		                    FROM BOARD
+		                   WHERE BOARD_INDEX = '5'
+		                   <include refid="searchCondition"/>) A) B
+	      <![CDATA[
+		  WHERE B.RNUM <= #startCount#
+		    AND B.RNUM >= #endCount#
+		  ]]> 
+		  ORDER BY B.RNUM DESC
+	</select>
+	
+	
+	<insert id="insertImageboard" parameterClass="boardVO">
+		<selectKey keyProperty="board_no" resultClass="String">
+			SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO BOARD(BOARD_NO,
+					 	  BOARD_INDEX,
+						  BOARD_TITLE,
+						  BOARD_WRITER,
+						  BOARD_NICKNAME,
+						  BOARD_CONTENT)   values  (#board_no#,
+												    #board_index#,
+												    #board_title#,
+												    #board_writer#,
+												    #board_nickname#,
+												    #board_content#)
+	</insert>
+	
+	<select id="totalCount" parameterClass="map" resultClass="int">
+	  SELECT COUNT(BOARD_NO)
+        FROM BOARD
+       WHERE BOARD_DELETE = 'n'
+         AND BOARD_INDEX = '5'
+       <include refid="searchCondition"/> 
+	</select>
+	
+	
+	<select id="selectImageboardInfo" resultMap="boardResultMap">
+		SELECT *
+		  FROM BOARD
+		 WHERE BOARD_NO = #board_no#
+		   AND BOARD_DELETE = 'n'
+	</select>
+	
+	<update id="deleteImageboard" parameterClass="String">
+      UPDATE BOARD
+      SET BOARD_DELETE='y'
+      WHERE BOARD_NO=#board_no#
+    </update>
+		 
+	<update id="plusHit" parameterClass="String">
+		UPDATE BOARD
+		   SET BOARD_HIT = BOARD_HIT + 1
+		 WHERE BOARD_NO = #board_no#
+	</update>
+	
+	<!-- 동미 -->
+   <select id="databoardList" parameterClass="map" resultClass="boardVO">
+       SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="selectBoardAll"/>  
+                   AND   BOARD_INDEX = '3'
+                 <!--   <include refid="searchBoardCondition"/> -->
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <!--  
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+                  -->
+         ORDER BY B.RNUM DESC
+   </select>
+   
+   <select id="dataTotalCount" parameterClass="map" resultClass="String">
+      SELECT COUNT(BOARD_NO)
+        FROM BOARD
+       WHERE BOARD_DELETE = 'n'
+       AND   BOARD_INDEX = '3'
+       <include refid="searchBoardCondition"/>
+   </select>
+   
+   <insert id="insertdataboard" parameterClass="boardVO">
+      <selectKey keyProperty="board_no" resultClass="String">
+         SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO BOARD(BOARD_NO
+                     ,BOARD_NICKNAME
+                     ,BOARD_TITLE
+                     ,BOARD_CONTENT
+                     ,BOARD_WRITER
+                     ,BOARD_INDEX
+                     ,BOARD_GROUP
+                  )
+               VALUES(#board_no#
+                     ,#board_nickname#
+                     ,#board_title#
+                     ,#board_content#
+                     ,#board_writer#
+                     ,'3'
+                     ,#board_no#
+                     )
+      
+   </insert>
+   
+   <select id ="boardInfo" parameterClass="map" resultMap = "boardResultMap">
+          <include refid="selectBoardAll"/>
+            AND BOARD_NO = #board_no#
+   </select>
+   
+    <update id="updateDataboard" parameterClass="boardVO">
+      UPDATE BOARD
+      SET BOARD_TITLE=#board_title#,
+          BOARD_CONTENT=#board_content#
+           WHERE BOARD_NO=#board_no#
+   </update>
+   
+   <update id="deleteDataboard" parameterClass="map">
+      UPDATE BOARD
+      SET BOARD_DELETE='y'
+      WHERE BOARD_NO=#board_no#
+   </update>
+   
+   <!-- 답글 -->
+   	<select id="incrementSeq" parameterClass="boardVO"
+			resultClass="String">
+			SELECT MAX(BOARD_SEQ) + 1
+			FROM BOARD
+			WHERE BOARD_GROUP = #board_group#
+	</select>
+		
+	<update id="updateSeq" parameterClass="boardVO">
+			UPDATE BOARD
+			SET BOARD_SEQ = BOARD_SEQ+1
+			WHERE BOARD_GROUP = #board_group#
+			AND BOARD_SEQ > #board_seq#
+	</update>
+	
+	<insert id = "insertDataboardReply" parameterClass="boardVO">
+			<selectKey keyProperty="board_no" resultClass="String">
+				SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+			</selectKey>
+			INSERT INTO BOARD(BOARD_NO
+                                  ,BOARD_TITLE
+                                  ,BOARD_WRITER
+                                  ,BOARD_NICKNAME
+                                  ,BOARD_CONTENT
+                                  ,BOARD_GROUP
+                                  ,BOARD_SEQ
+                                  ,BOARD_DEPTH
+                                  ,BOARD_INDEX)
+                         VALUES(#board_no#
+                               ,#board_title#
+                               ,#board_writer#
+                               ,#board_nickname#             
+                               ,#board_content#
+                               ,#board_group#
+                               ,#board_seq#
+                               ,#board_depth#
+                               ,'3')
+		</insert> 
+		
+	
+	<!-- 동미 공지사항 -->
+	   <select id="noticeboardList" parameterClass="map" resultClass="boardVO">
+        SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="selectBoardAll"/>  
+                   AND   BOARD_INDEX = '2'
+                   <include refid="searchBoardCondition"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B  
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+         ORDER BY B.RNUM DESC
+   </select>
+
+  <select id="noticeTotalCount" parameterClass="map" resultClass="String">
+      SELECT COUNT(BOARD_NO)
+        FROM BOARD
+       WHERE BOARD_DELETE = 'n'
+       AND   BOARD_INDEX = '2'
+       <include refid="searchBoardCondition"/>
+   </select>
+   
+    <insert id="insertnoticeboard" parameterClass="boardVO">
+      <selectKey keyProperty="board_no" resultClass="String">
+         SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO BOARD(BOARD_NO
+                     ,BOARD_NICKNAME
+                     ,BOARD_TITLE
+                     ,BOARD_CONTENT
+                     ,BOARD_WRITER
+                     ,BOARD_INDEX
+                     ,BOARD_GROUP
+                  )
+               VALUES(#board_no#
+                     ,#board_nickname#
+                     ,#board_title#
+                     ,#board_content#
+                     ,#board_writer#
+                     ,'2'
+                     ,#board_no#
+                     )
+      
+   </insert>
+   	
+   <!-- 한별 -->
+   
+   <sql id="selectAllFreeboard">
+      SELECT *
+       FROM BOARD, MEMBER
+      WHERE BOARD_DELETE = 'n' 
+      AND BOARD_INDEX = 1
+      AND BOARD.BOARD_WRITER = MEMBER.MEM_ID
+   </sql>
+   
+   
+   <resultMap class="boardVO" id="freebaordResultMap">
+      <result property="board_no" column="board_no" />
+      <result property="board_title" column="board_title" />
+      <result property="board_index" column="board_index" />
+      <result property="board_writer" column="board_writer" />
+      <result property="board_nickname" column="board_nickname" />
+      <result property="board_content" column="board_content" />
+      <result property="board_hit" column="board_hit" />
+      <result property="board_delete" column="board_delete" />
+      <result property="board_group" column="board_group" />
+      <result property="board_seq" column="board_seq" />
+      <result property="board_depth" column="board_depth" />
+   
+      <result property="items" column="board_no" select="fileitem.fileitemList"></result>
+   
+   </resultMap>
+   
+   
+   <sql id="searchConditionByboard">
+      <dynamic prepend="AND">
+         <isNotEmpty property="search_keyword" open="(" close=")">
+            <isEqual property="search_keycode" compareValue="TOTAL">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+               OR BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+               OR BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+               OR BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="TITLE">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="CONTENT">
+               BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NICKNAME">
+               BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="WRITER">
+               BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NAME">
+               MEM_NAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+         </isNotEmpty>
+      </dynamic>
+   </sql>
+   
+   
+   <select id="freeboardList" resultClass="boardVO" parameterClass="map">
+      SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="selectAllFreeboard"/>   
+                  <include refid="searchConditionByboard"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+      ORDER BY B.RNUM DESC
+   </select>   
+   
+   
+   <select id="freeboardInfo" resultMap="freebaordResultMap" parameterClass="map">
+      <include refid="selectAllFreeboard"/>   
+      AND BOARD_NO=#board_no#
+   </select>
+  
+   
+   
+   <insert id="insertFreeboard" parameterClass="boardVO">
+      <selectKey keyProperty="board_no" resultClass="String">
+         SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO BOARD(BOARD_NO
+                     ,BOARD_NICKNAME
+                     ,BOARD_TITLE
+                     ,BOARD_CONTENT
+                     ,BOARD_WRITER
+                     ,BOARD_INDEX
+                     ,BOARD_GROUP
+                  )
+               VALUES(#board_no#
+                     ,#board_nickname#
+                     ,#board_title#
+                     ,#board_content#
+                     ,#board_writer#
+                     ,'1'
+                     ,#board_no#
+                     )
+      
+   </insert>
+   
+   
+   <update id="updateFreeboard" parameterClass="boardVO">
+      UPDATE BOARD
+      SET BOARD_TITLE=#board_title#,
+         BOARD_CONTENT=#board_content#
+      WHERE BOARD_NO=#board_no#
+   </update>
+   
+   <update id="deleteFreeboard" parameterClass="boardVO">
+      UPDATE BOARD
+      SET BOARD_DELETE='y'
+      WHERE BOARD_NO=#board_no#
+   </update>
+   
+   <select id="totalCounting" parameterClass="map" resultClass="String">
+      SELECT COUNT(*) 
+      FROM BOARD, MEMBER
+      WHERE BOARD_DELETE = 'n'
+      AND BOARD.BOARD_WRITER = MEMBER.MEM_ID
+      AND BOARD_INDEX = 1
+      <include refid="searchConditionByboard"/>
+   </select>
+   
+   
+   
+      
+   <insert id="replyFreeboard" parameterClass="boardVO">
+	   <selectKey keyProperty="board_no" resultClass="String">
+				SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+			</selectKey>
+			INSERT INTO 
+				BOARD(
+					 BOARD_NO       
+					,BOARD_TITLE    
+					,BOARD_WRITER   
+					,BOARD_NICKNAME 
+					,BOARD_CONTENT  
+					,BOARD_GROUP  
+					,BOARD_SEQ
+					,BOARD_DEPTH
+					,BOARD_INDEX
+					  
+				)
+				VALUES(
+					 #board_no#
+					,#board_title#
+					,#board_writer#
+					,#board_nickname#
+					,#board_content#
+					,#board_group#
+					,#board_seq#
+					,#board_depth#
+					,1
+					)
+   </insert>
+   
+   
+   <select id="incrementSeqbyFreeboard" parameterClass="boardVO" resultClass="string">
+		SELECT MAX(BOARD_SEQ) + 1
+			FROM BOARD
+		  WHERE BOARD_GROUP = #board_group#
+	</select>
+	
+	<update id="updateSeqbyFreeboard" parameterClass="boardVO">
+		UPDATE BOARD
+			SET BOARD_SEQ = BOARD_SEQ + 1
+		  WHERE BOARD_GROUP = #board_group#
+		  	AND BOARD_SEQ > #board_seq#	
+	</update>
+	
+
+
+
+	<!-- 한별 qna -->
+	
+	
+	<sql id="selectAllQNA">
+      SELECT *
+       FROM BOARD, MEMBER
+      WHERE BOARD_DELETE = 'n' 
+      AND BOARD_INDEX = 4
+      AND BOARD.BOARD_WRITER = MEMBER.MEM_ID
+   </sql>
+   
+	 <select id="freeboardListQNA" resultClass="boardVO" parameterClass="map">
+      SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="selectAllQNA"/>   
+                  <include refid="searchConditionByboard"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+      ORDER BY B.RNUM DESC
+   </select>   
+   
+    
+
+   
+   <insert id="insertFreeboardQNA" parameterClass="boardVO">
+      <selectKey keyProperty="board_no" resultClass="String">
+         SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO BOARD(BOARD_NO
+                     ,BOARD_NICKNAME
+                     ,BOARD_TITLE
+                     ,BOARD_CONTENT
+                     ,BOARD_WRITER
+                     ,BOARD_INDEX
+                     ,BOARD_GROUP
+                  )
+               VALUES(#board_no#
+                     ,#board_nickname#
+                     ,#board_title#
+                     ,#board_content#
+                     ,#board_writer#
+                     ,'4'
+                     ,#board_no#
+                     )
+      
+   </insert>
+   
+
+   
+
+   <select id="totalCountingQNA" parameterClass="map" resultClass="String">
+      SELECT COUNT(*) 
+      FROM BOARD, MEMBER
+      WHERE BOARD_DELETE = 'n'
+      AND BOARD.BOARD_WRITER = MEMBER.MEM_ID
+      AND BOARD_INDEX = 4
+      <include refid="searchConditionByboard"/>
+   </select>
+   
+   
+   
+      
+   <insert id="replyFreeboardQNA" parameterClass="boardVO">
+	   <selectKey keyProperty="board_no" resultClass="String">
+				SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+			</selectKey>
+			INSERT INTO 
+				BOARD(
+					 BOARD_NO       
+					,BOARD_TITLE    
+					,BOARD_WRITER   
+					,BOARD_NICKNAME 
+					,BOARD_CONTENT  
+					,BOARD_GROUP  
+					,BOARD_SEQ
+					,BOARD_DEPTH
+					,BOARD_INDEX
+					  
+				)
+				VALUES(
+					 #board_no#
+					,#board_title#
+					,#board_writer#
+					,#board_nickname#
+					,#board_content#
+					,#board_group#
+					,#board_seq#
+					,#board_depth#
+					,4
+					)
+   </insert>
+   
+ 	
+	  <select id="freeboardInfoQNA" resultMap="freebaordResultMap" parameterClass="map">
+      <include refid="selectAllQNA"/>   
+      AND BOARD_NO=#board_no#
+   </select>
+	
+	
+	<update id="updateCountNo" parameterClass="boardVO">
+		UPDATE BOARD
+			SET BOARD_HIT = BOARD_HIT + 1
+		  WHERE BOARD_NO = #board_no#
+	</update>
+   
+   <!-- 창수 -->
+   
+  
+   
+   
+   <sql id="AllQuestionList">
+		select * 
+		from board
+		where board_index = '6'
+		and board_delete = 'n'
+	</sql>
+	
+	
+	
+	<resultMap class="boardVO" id="questionResultMap">
+      <result property="board_no" column="board_no" />
+      <result property="board_title" column="board_title" />
+      <result property="board_index" column="board_index" />
+      <result property="board_writer" column="board_writer" />
+      <result property="board_nickname" column="board_nickname" />
+      <result property="board_content" column="board_content" />
+      <result property="board_hit" column="board_hit" />
+      <result property="board_delete" column="board_delete" />
+   
+      <result property="items" column="board_no" select="fileitem.fileitemList"></result>
+   
+   </resultMap>
+   
+   <select id="questionTotalCounting" parameterClass="map" resultClass="String">
+      SELECT COUNT(*) 
+      FROM BOARD, MEMBER
+      WHERE BOARD_DELETE = 'n'
+      AND BOARD.BOARD_WRITER = MEMBER.MEM_ID
+      AND BOARD_INDEX = 6
+      <include refid="searchConditionByboard"/>
+   </select>
+	
+	
+	 <sql id="searchConditionByQuesboard">
+      <dynamic prepend="AND">
+         <isNotEmpty property="search_keyword" open="(" close=")">
+            <isEqual property="search_keycode" compareValue="TOTAL">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+               OR BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+               OR BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+               OR BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="TITLE">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="CONTENT">
+               BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NICKNAME">
+               BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="WRITER">
+               BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NAME">
+               MEM_NAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+         </isNotEmpty>
+      </dynamic>
+   </sql>
+	
+	
+	
+	
+	 <select id="questionList" resultClass="boardVO" parameterClass="map">
+      SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="AllQuestionList"/>   
+                  <include refid="searchConditionByQuesboard"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+      ORDER BY B.RNUM DESC
+   </select>   
+   
+   
+   
+   
+	<!--자주하는 질문 검색(유저)-->
+	<select id="SearchQuestionList" parameterClass="String" resultClass="BoardVO">
+		select * 
+		from board
+		where board_no = #board_no#
+	</select>
+	
+	<!-- 상세글 출력(유저)  -->
+	<select id="onlyQuestion" resultMap="questionResultMap" parameterClass="map">
+      SELECT *
+      FROM BOARD
+      WHERE BOARD_DELETE = 'n' 
+      AND BOARD_INDEX = 6
+      AND BOARD_NO=#board_no#
+   </select>
+	
+	
+	<!-- 상세보기를 할때 글 번호에 해당하는 데이터의 조회수를 1증가시켜주는 sql -->
+
+	<update id="updateHit" parameterClass="BoardVO">
+		update board
+		set hit = hit +1
+		where board_no=#board_no#
+		AND BOARD_INDEX = 6
+	</update>
+
+	
+
+	
+	
+	
+	
+	<!--자주하는질문 등록(관리자)-->
+    <insert id="insertQuestion" parameterClass="BoardVO">
+    	<selectKey keyProperty="board_no" resultClass="String">
+				SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		 INSERT INTO board (
+		 	BOARD_NO
+			,BOARD_INDEX
+			,BOARD_TITLE
+			,BOARD_NICKNAME
+			,BOARD_WRITER
+			,BOARD_CONTENT
+			,BOARD_GROUP
+			)
+ 			VALUES (
+ 			#board_no#,
+			6,
+			#board_title#,
+			#board_nickname#,
+			#board_writer#,
+			#board_content#,
+			#board_no#
+			)
+	 </insert>
+	 
+	 
+
+   
+       <!--자주하는질문 목록 출력(관리자)-->
+    <sql id="getQuestionAll" >
+      	select * 
+		from board
+		where board_index = '6'
+		and board_delete = 'n'
+    </sql>
+    
+   <resultMap class="boardVO" id="adQuesbaordResultMap">
+      <result property="board_no" column="board_no" />
+      <result property="board_title" column="board_title" />
+      <result property="board_index" column="board_index" />
+      <result property="board_writer" column="board_writer" />
+      <result property="board_nickname" column="board_nickname" />
+      <result property="board_content" column="board_content" />
+      <result property="board_hit" column="board_hit" />
+      <result property="board_delete" column="board_delete" />
+      <result property="items" column="board_no" select="fileitem.fileitemList"></result>
+   </resultMap>
+    
+
+	 
+	<!--  <검색기능 관리자> -->
+	  <sql id="searchConditionByAdminQuesboard">
+      <dynamic prepend="AND">
+         <isNotEmpty property="search_keyword" open="(" close=")">
+            <isEqual property="search_keycode" compareValue="TOTAL">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+               OR BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+               OR BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+               OR BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="TITLE">
+               BOARD_TITLE LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="CONTENT">
+               BOARD_CONTENT LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NICKNAME">
+               BOARD_NICKNAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="WRITER">
+               BOARD_WRITER LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+            <isEqual property="search_keycode" compareValue="NAME">
+               MEM_NAME LIKE '%' || #search_keyword# || '%'
+            </isEqual>
+         </isNotEmpty>
+      </dynamic>
+   </sql>
+   
+   	<select id="AdQuestionTotalCounting" parameterClass="map" resultClass="String">
+      SELECT COUNT(*) 
+      FROM BOARD, MEMBER
+      WHERE BOARD_DELETE = 'n'
+      AND BOARD.BOARD_WRITER = MEMBER.MEM_ID
+      AND BOARD_INDEX = 6
+      <include refid="searchConditionByAdminQuesboard"/>
+   </select>
+   
+      	 <select id="adminQuestionList" resultClass="boardVO" parameterClass="map">
+      SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="getQuestionAll"/>   
+                  <include refid="searchConditionByAdminQuesboard"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+      ORDER BY B.RNUM DESC
+   </select>   
+
+
+    <!-- 자주하는질문 상세글 출력(관리자)  -->
+    <select id="adminOnlyQuestion" resultMap="adQuesbaordResultMap" parameterClass="map">
+      SELECT *
+      FROM BOARD
+      WHERE BOARD_DELETE = 'n' 
+      AND BOARD_INDEX = 6
+      AND BOARD_NO=#board_no#
+   </select>
+   
+
+
+    <!--자주하는질문 삭제(관리자)-->
+    
+        
+    <update id="deleteQuestion" parameterClass="boardVO">
+      UPDATE BOARD
+      SET BOARD_DELETE='y'
+      WHERE BOARD_NO=#board_no#
+   </update>
+
+
+    <update id="modifyQuestion" parameterClass="boardVO">
+      UPDATE board
+      SET BOARD_TITLE = #board_title# 
+         ,BOARD_CONTENT = #board_content# 
+      WHERE BOARD_NO = #board_no#
+   </update>
+
+    <!--자주하는질문 검색(관리자)-->
+    <select id="searchQuestion" parameterClass="boardVO" resultClass="boardVO">
+        select *
+        from board
+        where BOARD_NO = #board_no# 
+        AND BOARD_TITLE like '%'||#board_title#||'%'
+
+    </select>
+	
+</sqlMap>

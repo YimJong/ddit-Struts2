@@ -1,0 +1,44 @@
+package kr.or.ddit.admin.noticeboard.controller;
+
+import java.lang.reflect.InvocationTargetException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.BeanUtils;
+
+import kr.or.ddit.vo.BoardVO;
+
+public class InsertNoticeboardAction {
+
+	/*
+	@Override
+	public boolean isRedirect() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String process(HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		FileUploadRequestWrapper wrapper = new FileUploadRequestWrapper(request);
+		
+		BoardVO databoardInfo = new BoardVO();
+		
+		try {
+			BeanUtils.populate(databoardInfo, wrapper.getParameterMap());
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+		INoticeboardService service = NoticeboardServiceImpl.getInstance();
+		service.insertDataboard(databoardInfo, wrapper.getFileItemValues("files"));
+		
+		return "/admin/noticeboard/noticeboardList.do";
+	}
+	*/
+
+}

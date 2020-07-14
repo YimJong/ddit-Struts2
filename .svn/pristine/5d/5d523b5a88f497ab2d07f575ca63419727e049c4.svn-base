@@ -1,0 +1,45 @@
+package kr.or.ddit.user.freeboard.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import kr.or.ddit.user.freeboard.service.FreeboardServiceImpl;
+import kr.or.ddit.user.freeboard.service.IFreeboardService;
+import kr.or.ddit.vo.BoardVO;
+
+public class FreeboardViewAction {
+
+	private String board_no;
+	private String rnum;
+	private BoardVO freeboardInfo;
+	
+	public String execute(){
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("board_no", this.board_no);
+		
+		IFreeboardService service = FreeboardServiceImpl.getInstance();
+		this.freeboardInfo = service.freeboardInfo(params);
+		
+		return "success";
+		
+		
+	}
+
+	public void setBoard_no(String board_no) {
+		this.board_no = board_no;
+	}
+
+	public void setRnum(String rnum) {
+		this.rnum = rnum;
+	}
+
+	public BoardVO getFreeboardInfo() {
+		return freeboardInfo;
+	}
+
+	
+	
+	
+	
+}

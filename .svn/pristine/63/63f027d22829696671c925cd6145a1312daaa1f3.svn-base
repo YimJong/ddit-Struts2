@@ -1,0 +1,109 @@
+package kr.or.ddit.admin.member.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.member.service.IMemberService;
+import kr.or.ddit.member.service.IMemberServiceImpl;
+import kr.or.ddit.vo.MemberVO;
+
+import com.opensymphony.xwork2.Action;
+
+public class MemberListAction implements Action {
+	List<MemberVO> memberList;
+	private String search_base_keyword;
+	private String search_base;
+	private String search_sido;
+	private String search_gugun;
+	private String search_hp1;
+	private String search_hp2;
+	private String search_hp3;
+	private String search_year;
+	private String search_month;
+	private String search_day;
+	private String currentPage;
+
+	@Override
+	public String execute() throws Exception {
+		IMemberService service = IMemberServiceImpl.getInstance();
+		
+		if(currentPage == null) {
+			this.currentPage = "1";
+		}
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("search_base_keyword", search_base_keyword);
+		params.put("search_base", search_base);
+		params.put("search_sido", search_sido);
+		params.put("search_gugun", search_gugun);
+		params.put("search_hp1", search_hp1);
+		params.put("search_hp2", search_hp2);
+		params.put("search_hp3", search_hp3);
+		params.put("search_year", search_year);
+		params.put("search_month", search_month);
+		params.put("search_day", search_day);
+		
+		String totalCount = service.adminTotalCount(params);
+		
+		
+		
+		return SUCCESS;
+	}
+	
+	
+	
+	
+	
+	public List<MemberVO> getMemberList() {
+		return memberList;
+	}
+	
+	public void setSearch_base_keyword(String search_base_keyword) {
+		this.search_base_keyword = search_base_keyword;
+	}
+
+	public void setSearch_base(String search_base) {
+		this.search_base = search_base;
+	}
+
+	public void setSearch_sido(String search_sido) {
+		this.search_sido = search_sido;
+	}
+
+	public void setSearch_gugun(String search_gugun) {
+		this.search_gugun = search_gugun;
+	}
+
+	public void setSearch_hp1(String search_hp1) {
+		this.search_hp1 = search_hp1;
+	}
+
+	public void setSearch_hp2(String search_hp2) {
+		this.search_hp2 = search_hp2;
+	}
+
+	public void setSearch_hp3(String search_hp3) {
+		this.search_hp3 = search_hp3;
+	}
+
+	public void setSearch_year(String search_year) {
+		this.search_year = search_year;
+	}
+
+	public void setSearch_month(String search_month) {
+		this.search_month = search_month;
+	}
+
+	public void setSearch_day(String search_day) {
+		this.search_day = search_day;
+	}
+
+
+
+
+
+	public void setCurrentPage(String currentPage) {
+		this.currentPage = currentPage;
+	}
+}

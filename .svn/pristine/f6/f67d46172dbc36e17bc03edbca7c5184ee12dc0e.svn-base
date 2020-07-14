@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace = "referenceRoom">
+    <typeAlias alias="boardVO" type="kr.or.ddit.vo.BoardVO"/>
+    
+    <sql id="selectBoardAll">
+		SELECT *
+		FROM BOARD
+		WHERE BOARD_DELETE = 'n'
+	</sql>
+	
+	<sql id="searchBoardCondition">
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword" open="(" close=")">
+				<isEqual property="search_keycode" compareValue="TOTAL">
+					BOARD_TITLE LIKE '%'||#search_keyword#||'%'
+					OR BOARD_CONTENT LIKE '%'||#search_keyword#||'%'
+					OR BOARD_NICKNAME LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="TITLE">
+					BOARD_TITLE LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="CONTENT">
+					BOARD_CONTENT LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="NICKNAME">
+					BOARD_NICKNAME LIKE '%'||#search_keyword#||'%'
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+    
+    <select id="referenceRoomList" parameterClass="map" resultClass="boardVO">
+       SELECT B.*
+         FROM (
+            SELECT ROWNUM RNUM, A.*
+               FROM(
+                  <include refid="selectBoardAll"/>  
+                   AND   BOARD_INDEX = '3'
+                  <include refid="searchBoardCondition"/>
+                  ORDER BY BOARD_GROUP, BOARD_SEQ DESC
+                  ) A) B
+                  <![CDATA[
+                  WHERE B.RNUM <= #startCount#
+                  AND B.RNUM >= #endCount#
+                  ]]>
+         ORDER BY B.RNUM DESC
+   </select>
+   
+   <select id="referenceRoomCount" parameterClass="map" resultClass="String">
+      SELECT COUNT(BOARD_NO)
+        FROM BOARD
+       WHERE BOARD_DELETE = 'n'
+       AND   BOARD_INDEX = '3'
+       <include refid="searchBoardCondition"/>
+   </select>
+   
+   <insert id="insertReferenceRoom" parameterClass="boardVO">
+      <selectKey keyProperty="board_no" resultClass="String">
+         SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO BOARD(BOARD_NO
+                     ,BOARD_NICKNAME
+                     ,BOARD_TITLE
+                     ,BOARD_CONTENT
+                     ,BOARD_WRITER
+                     ,BOARD_INDEX
+                     ,BOARD_GROUP
+                  )
+               VALUES(#board_no#
+                     ,#board_nickname#
+                     ,#board_title#
+                     ,#board_content#
+                     ,#board_writer#
+                     ,'3'
+                     ,#board_no#
+                     )
+      
+   </insert>
+   
+   <resultMap id="boardResultMap" class="boardVO">
+			<result property = "board_no"		 column="board_no" />
+            <result property = "board_title"	 column="board_title" />
+            <result property = "board_writer"	 column="board_writer" />
+            <result property = "board_nickname" column="board_nickname" />
+            <result property = "board_content"	 column="board_content" />
+            <result property = "board_hit"	 	 column="board_hit" />
+            <result property = "board_reg_date" column="board_reg_date" />
+            <result property = "board_delete"	 column="board_delete" />
+            <result property = "board_group"	 column="board_group" />
+            <result property = "board_seq"		 column="board_seq" />
+            <result property = "board_depth"	 column="board_depth" />
+            <result property = "items" column="board_no" select="fileitem.datafileitemList"/>
+	</resultMap>
+	
+   <select id ="boardInfo" parameterClass="map" resultMap = "boardResultMap">
+          <include refid="selectBoardAll"/>
+            AND BOARD_NO = #board_no#
+   </select>
+   
+		
+    <update id="updateReferenceRoom" parameterClass="boardVO">
+      UPDATE BOARD
+      SET BOARD_TITLE=#board_title#,
+          BOARD_CONTENT=#board_content#
+           WHERE BOARD_NO=#board_no#
+   </update>
+   
+   <update id="deleteReferenceRoom" parameterClass="map">
+      UPDATE BOARD
+      SET BOARD_DELETE='y'
+      WHERE BOARD_NO=#board_no#
+   </update>
+   
+   <!-- 답글 -->
+   	<select id="incrementSeq" parameterClass="boardVO"
+			resultClass="String">
+			SELECT MAX(BOARD_SEQ) + 1
+			FROM BOARD
+			WHERE BOARD_GROUP = #board_group#
+	</select>
+		
+	<update id="updateSeq" parameterClass="boardVO">
+			UPDATE BOARD
+			SET BOARD_SEQ = BOARD_SEQ+1
+			WHERE BOARD_GROUP = #board_group#
+			AND BOARD_SEQ > #board_seq#
+	</update>
+	
+	<insert id = "insertReferenceRoomReply" parameterClass="boardVO">
+			<selectKey keyProperty="board_no" resultClass="String">
+				SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+			</selectKey>
+			INSERT INTO BOARD(BOARD_NO
+                                  ,BOARD_TITLE
+                                  ,BOARD_WRITER
+                                  ,BOARD_NICKNAME
+                                  ,BOARD_CONTENT
+                                  ,BOARD_GROUP
+                                  ,BOARD_SEQ
+                                  ,BOARD_DEPTH
+                                  ,BOARD_INDEX)
+                         VALUES(#board_no#
+                               ,#board_title#
+                               ,#board_writer#
+                               ,#board_nickname#             
+                               ,#board_content#
+                               ,#board_group#
+                               ,#board_seq#
+                               ,#board_depth#
+                               ,'3')
+		</insert> 
+		
+		<!-- 조회수 1씩 증가  -->
+		<update id="updateCountNo" parameterClass="boardVO">
+		UPDATE BOARD
+			SET BOARD_HIT = BOARD_HIT + 1
+		  WHERE BOARD_NO = #board_no#
+	</update>
+    
+    </sqlMap>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace = "qnaFileitem">
+		<typeAlias alias="fileitemVO" type="kr.or.ddit.vo.FileItemVO"/>
+		
+		<!-- 동미 -->
+		<statement id="fileitemList" resultClass="fileitemVO">
+			SELECT * 
+			FROM FILEITEM
+			WHERE BOARD_NO = #board_no#
+		</statement>
+		
+		<insert id="insertFile" parameterClass="fileitemVO">
+	      <selectKey keyProperty="file_no">
+	         SELECT FILEITEM_SEQ.NEXTVAL FROM DUAL
+	      </selectKey>
+	      INSERT INTO FILEITEM (FILE_NO,
+	                       BOARD_INDEX,
+	                       BOARD_NO,
+	                       FILE_NAME,
+	                       FILE_SAVE_NAME,
+	                       FILE_TYPE)   values  (#file_no#,
+	                                             4,
+	                                             #board_no#,
+	                                             #file_name#,
+	                                             #file_save_name#,
+	                                             #file_type#)
+  		 </insert>
+		
+		<select id="fileListInfo" parameterClass="String" resultClass="fileitemVO">
+			SELECT *
+			  FROM FILEITEM
+			 WHERE BOARD_NO = #board_no#
+		</select>
+		
+		
+		<update id="deleteFileitem">
+			UPDATE FILEITEM
+			   SET FILE_STATUS = 'y'
+			 WHERE BOARD_NO = #board_no#
+		</update>
+<!-- 			<insert id="datainsertFileItem" parameterClass="fileitemVO">
+				<selectKey keyProperty="file_no">
+					SELECT FILEITEM_SEQ.NEXTVAL FILE_SEQ FROM DUAL 
+				</selectKey>			
+				INSERT INTO FILEITEM(FILE_NO
+									,BOARD_INDEX
+									,BOARD_NO
+									,FILE_NAME
+									,FILE_SAVE_NAME
+									,FILE_TYPE)
+							VALUES(#file_no#
+								   ,'3'
+								   ,#board_no#
+								   ,#file_name#
+								   ,#file_save_name#
+								   ,#file_type#)
+			</insert>
+			
+			
+			<select id="fileitemInfo" parameterClass="map" resultClass="fileitemVO">
+				SELECT * 
+				FROM FILEITEM
+				WHERE FILE_NO = #file_no#
+			</select>
+			
+			<insert id="noticeinsertFileItem" parameterClass="fileitemVO">
+				<selectKey keyProperty="file_no">
+					SELECT FILEITEM_SEQ.NEXTVAL FROM DUAL 
+				</selectKey>			
+				INSERT INTO FILEITEM(FILE_NO
+									,BOARD_INDEX
+									,BOARD_NO
+									,FILE_NAME
+									,FILE_SAVE_NAME
+									,FILE_TYPE)
+							VALUES(#file_no#
+								   ,'2'
+								   ,#board_no#
+								   ,#file_name#
+								   ,#file_save_name#
+								   ,#file_type#)
+			</insert>
+			
+			
+			
+	종원
+   <select id="imageboardFileitemInfo" parameterClass="boardVO" resultClass="fileitemVO">
+      SELECT *
+        FROM FILEITEM
+       WHERE BOARD_INDEX = '5'
+         AND BOARD_NO = #board_no#
+   </select>
+   
+   
+
+   
+   
+   한별
+	
+	
+	
+	<insert id="insertFileitem" parameterClass="fileitemVO">
+		<selectKey keyProperty="file_no">
+			SELECT FILEITEM_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO FILEITEM(FILE_NO
+							,BOARD_INDEX
+							,BOARD_NO
+							,FILE_NAME
+							,FILE_SAVE_NAME
+							,FILE_REG_DATE
+							,FILE_TYPE
+						)
+					VALUES(#file_no#
+							,1
+							,#board_no#
+							,#file_name#
+							,#file_save_name#
+							,sysdate
+							,#file_type#
+						)
+		
+	</insert>
+	
+	
+	<statement id="fileitemList" resultClass="fileitemVO">
+		SELECT *
+		FROM FILEITEM
+		WHERE BOARD_NO = #board_no#
+	</statement>
+	
+	
+	
+	
+	qna 한별
+	<insert id="insertFileitemQna" parameterClass="fileitemVO">
+		<selectKey keyProperty="file_no">
+			SELECT FILEITEM_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO FILEITEM(FILE_NO
+							,BOARD_INDEX
+							,BOARD_NO
+							,FILE_NAME
+							,FILE_SAVE_NAME
+							,FILE_REG_DATE
+							,FILE_TYPE
+						)
+					VALUES(#file_no#
+							,4
+							,#board_no#
+							,#file_name#
+							,#file_save_name#
+							,sysdate
+							,#file_type#
+						)
+		
+	</insert>
+	
+	
+ 	창수 위에도씀
+	<insert id="insertFileitemQuestion" parameterClass="fileitemVO">
+		<selectKey keyProperty="file_no">
+			SELECT FILEITEM_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO FILEITEM(FILE_NO
+							,BOARD_INDEX
+							,BOARD_NO
+							,FILE_NAME
+							,FILE_SAVE_NAME
+							,FILE_REG_DATE
+							,FILE_TYPE
+						)
+					VALUES(#file_no#
+							,6
+							,#board_no#
+							,#file_name#
+							,#file_save_name#
+							,sysdate
+							,#file_type#
+						)
+		
+	</insert> -->
+	
+    </sqlMap>

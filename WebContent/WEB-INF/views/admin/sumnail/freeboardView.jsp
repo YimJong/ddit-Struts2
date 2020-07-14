@@ -1,0 +1,147 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>게시물 보기</title>
+
+<script>
+$(function(){
+	// 섬머노트를 div를 활용한 textarea에 추가.
+	// http://summernote.org 활용
+    $('.board_content').summernote({
+			height: 150,
+			codemirror: {
+			theme: 'monokai'
+		}
+    });
+    
+    $('#board_title').val('${freeboardInfo.board_title}');
+    $('#mem_id').val('${freeboardInfo.board_writer}');
+    $('.board_content').summernote('code','${freeboardInfo.board_content}');
+    
+    
+	$('#freeboard').submit(function(){
+		
+		
+		if($('input[name=board_title]').val() == "") {
+    		infoMsg('제목을 입력해주세요.');
+    		return false;
+    	}
+    	
+		
+    		$(this).attr('action', '${pageContext.request.contextPath}/admin/sumnail/updateSumnail.do');
+    		$(this).append('<input type="hidden" name="board_writer" value="${LOGIN_MEMBERINFO.mem_id}"></input>');
+    		$(this).append('<input type="hidden" name="board_content" value="'+ $('.board_content').summernote('code')+'"></input>');
+    		$(this).append('<input type="hidden" name="board_no" value="${freeboardInfo.board_no}"></input>');
+    });
+	
+	$('#deleteBtn').click(function(){
+    	location.href='${pageContext.request.contextPath}/admin/sumnail/deleteSumnail.do?board_no='+${freeboardInfo.board_no};
+
+	});
+	$('#listBtn').click(function(){
+    	location.href='${pageContext.request.contextPath}/admin/sumnail/sumnailList.do?search_keyword=${search_keyword}&search_keycode=${search_keycode}&currentPage=${currentPage}';
+
+	});
+	
+	 function infoMsg(value) {
+		 	BootstrapDialog.show({
+		 	    title: '알림',
+		 	    message: value
+		 	});
+		 }
+	 
+});
+</script>
+
+</head>
+<body>
+
+<div class="wrap">
+	<form id="freeboard" method="post">
+	<table width="1000" border="0" cellpadding="0" cellspacing="0">
+		<tr valign="top">
+			<td width="180"><jsp:include page="freeBoardMenu.jsp"></jsp:include></td>
+			<td width="30">&nbsp;</td>
+			<td width="790"> 
+				<div id="container">
+					<div class="title">썸네일게시판</div>
+					<table border="0" cellspacing="1" cellpadding="1">
+						<tr>
+						  <th>제목</th>
+						  <td><label class="bo_title"></label>
+						  	  <input type="text" id="board_title" name="board_title"> </td>
+						</tr>
+						<tr>
+						  <th>작성자</th>
+						  <td><label class="board_writer"></label>
+						  	<input type="text" id="mem_id" name="board_writer" disabled="true" >
+						  </td>
+						</tr>
+						<tr>
+						  <th>내용</th>
+						  <td><textarea rows="10" cols="110" class="board_content" style="overflow: auto;"></textarea> </td>
+						</tr>
+						<tr>
+						  <th>첨부파일</th>
+						  	<td>						
+						  		<img src="/files/${file_save_name }" alt="사진없음" onclick="javascript:location.href='${pageContext.request.contextPath }/file/fileDownload.do?fileName=${file_save_name }';">
+							</td>
+						</tr>
+					</table>
+					<div style="text-align:right">
+						<input id="modifyBtn" class="btn2" type="submit" value="수정"/> 
+						<input id="deleteBtn" class="btn2" type="button" value="삭제"/> 
+						<input id="listBtn" class="btn2" type="button" value="목록"/>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	</form>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

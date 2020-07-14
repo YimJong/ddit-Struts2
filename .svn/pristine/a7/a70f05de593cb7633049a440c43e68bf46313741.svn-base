@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="qnaPKG" extends="struts-default, tiles-default" namespace="/user/qna">
+	
+		<action name="qnaboardList" class="kr.or.ddit.user.qnaboard.controller.QnaListAction">
+			<result type="tiles">user/qnaboard/qnaboardList</result>
+		</action>
+		
+		<action name="qnaboardForm">
+			<result type="tiles">user/qnaboard/qnaboardForm</result>
+		</action>
+		
+		<action name="insertQnaboard" class="kr.or.ddit.user.qnaboard.controller.InsertQnaboardAction">
+			<interceptor-ref name="fileUpload"></interceptor-ref>
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="tiles">user/qnaboard/qnaboardList</result>
+		</action>
+	
+	</package>
+</struts>

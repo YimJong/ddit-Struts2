@@ -1,0 +1,37 @@
+package kr.or.ddit.user.question.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import com.ibatis.sqlmap.client.SqlMapClient;
+
+import kr.or.ddit.ibatis.factory.SqlMapClientFactory;
+import kr.or.ddit.vo.BoardVO;
+
+
+public class QuestionDaoImpl implements IQuestionDao{
+	private static IQuestionDao dao = new QuestionDaoImpl();
+	private SqlMapClient client;
+	
+	private QuestionDaoImpl(){
+		client = SqlMapClientFactory.getSqlMapClient();
+	}
+	
+	public static IQuestionDao getInstance(){
+		return (dao == null) ? dao = new QuestionDaoImpl() : dao;
+	}
+	
+	@Override
+	public List<BoardVO> questionList(Map<String, String> params) {
+		try {
+			return client.queryForList("question.questionList",params);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+
+}

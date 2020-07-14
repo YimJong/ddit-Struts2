@@ -1,0 +1,75 @@
+package kr.or.ddit.user.qnaboard.controller;
+
+import java.io.File;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
+import org.apache.struts2.ServletActionContext;
+
+import kr.or.ddir.utiles.FileUploadRequestWrapper;
+import kr.or.ddit.global.GlobalConstant;
+import kr.or.ddit.user.qnaboard.service.IQnaboardService;
+import kr.or.ddit.user.qnaboard.service.QnaboardServiceImpl;
+import kr.or.ddit.vo.BoardVO;
+
+import com.opensymphony.xwork2.Action;
+import com.opensymphony.xwork2.ModelDriven;
+
+public class InsertQnaboardAction implements Action, ModelDriven<BoardVO> {
+
+	private BoardVO boardInfo;
+	private String fileName;
+	
+	@Override
+	public String execute() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		FileUploadRequestWrapper wrapper = new FileUploadRequestWrapper(request);
+		
+		IQnaboardService service = QnaboardServiceImpl.getInstance();
+		
+		List<File> files = this.boardInfo.getFiles();
+		List<String> contentType = this.boardInfo.getFilesContentType(); 
+		List<String> fileNames = this.boardInfo.getFilesFileName(); 
+		
+		String file_save_name = "";
+		for(int i=0; i <files.size(); i++){
+			File targetFile = files.get(i);
+			if(targetFile.length() > 0){
+				String[] fileName = fileNames.get(i).split(".");
+				String genID = UUID.randomUUID().toString().replace("-", "");
+				file_save_name = fileName[0] + genID + fileName[1];
+				File saveFile = new File(GlobalConstant.FILE_PATH, 
+													 file_save_name);
+				FileUtils.copyFile(targetFile, saveFile);
+				this.fileName = fileNames.get(i);
+			}
+		}
+		FileItem[] filesCheck = wrapper.getFileItemValues("files");
+		
+		service.insertQnaboard(boardInfo, wrapper.getFileItemValues("files"));
+		
+		return SUCCESS;
+	}
+
+	
+	
+	@Override
+	public BoardVO getModel() {
+		this.boardInfo = new BoardVO();
+		
+		return this.boardInfo;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+}

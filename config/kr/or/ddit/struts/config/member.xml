@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="memberPKG" extends="abstractPKG" namespace="/user/member">
+		<action name="memberList" class="kr.or.ddit.member.controller.MemberListAction">
+			<interceptor-ref name="cryptoInterceptor"></interceptor-ref>	
+			<result type="tiles">user/member/memberList</result>
+		</action>
+		
+		<action name="zipcodeSearchForm">
+			<result>/WEB-INF/views/user/member/zipcodeSearchForm.jsp</result>
+		</action>
+		
+		<action name="picOpen">
+			<result>/WEB-INF/views/user/member/picOpenForm.jsp</result>
+		</action>
+		
+		<action name="zipcodeSearchResult" class="kr.or.ddit.member.controller.zipcodeSearchResultAction">
+			<result>/WEB-INF/views/user/member/zipcodeSearchForm.jsp</result>
+		</action>
+		
+		
+		<action name="memberView" class="kr.or.ddit.member.controller.MemberViewAction"
+			method="memberView">
+			<interceptor-ref name="cryptoInterceptor"></interceptor-ref>
+			<result>/WEB-INF/views/user/member/memberView.jsp</result>
+		</action>
+		
+		<action name="deleteMemberInfo" class="kr.or.ddit.member.controller.DeleteMemberInfoAction">
+			<result type = "redirectAction">
+				<param name ="namespace">/user/join</param>
+				<param name = "actionName">loginForm</param>
+			</result>
+		</action>
+		
+		<action name="updateMemberInfo" class="kr.or.ddit.member.controller.UpdateMemberInfoAction">
+			<!-- 액션 클래스를 만들 때 환경을 만들어준다  -->
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+				<param name="namespace">/user/member</param>
+				<param name="actionName">memberList</param>
+			</result>
+		</action>
+	
+		<action name="memberForm" class="kr.or.ddit.member.controller.memberFormAction">
+			<interceptor-ref name="cryptoInterceptor"></interceptor-ref>
+			<result type="tiles">user/member/memberForm</result>
+		</action>
+		
+		<action name="insertMemberInfo" class="kr.or.ddit.member.controller.InsertMemberInfoAction">
+			<!-- 액션 클래스를 만들 때 환경을 만들어준다  -->
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="redirect">
+				<![CDATA[/user/join/loginForm.do?message=${message}]]>
+			</result>
+		</action>
+		
+		
+		
+		<!-- ajax -->
+		<action name="idCheck" class="kr.or.ddit.member.controller.IDCheckAction">
+			
+		</action>
+		
+		<action name="myInfoForm" class="kr.or.ddit.member.controller.MyInfoFormAction">
+			<result type="tiles">user/member/userInfoView</result>
+		</action>
+		
+		<action name="updateMyInfo" class="kr.or.ddit.member.controller.UpdateMyInfoAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+				<param name="namespace">/user/noticeboard</param>
+				<param name="actionName">noticeboardList</param>
+			</result>
+		</action>
+
+	</package>
+</struts>

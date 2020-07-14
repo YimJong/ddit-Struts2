@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace = "buyer">
+    	<typeAlias alias="buyerVO" type="kr.or.ddit.vo.BuyerVO"/>
+    	<typeAlias alias="lprodVO" type="kr.or.ddit.vo.LprodVO"/>
+    	
+    	<sql id="searchCondition">
+			<dynamic prepend="AND">
+				<isNotEmpty property="search_keyword" open="(" close=")">
+					<isEqual property="search_keycode" compareValue="TOTAL">
+						BUYER_ID LIKE '%'||#search_keyword#||'%'
+						OR BUYER_NAME LIKE '%'||#search_keyword#||'%'
+						OR BUYER_CHARGER LIKE '%'||#search_keyword#||'%'
+					</isEqual>
+					
+					<isEqual property="search_keycode" compareValue="BUYERID">
+						BUYER_ID LIKE '%'||#search_keyword#||'%'
+					</isEqual>
+					
+					<isEqual property="search_keycode" compareValue="BUYERNAME">
+						BUYER_NAME LIKE '%'||#search_keyword#||'%'
+					</isEqual>
+					
+					<isEqual property="search_keycode" compareValue="BUYERCHARGER">
+						BUYER_CHARGER LIKE '%'||#search_keyword#||'%'
+					</isEqual>
+					
+					
+				</isNotEmpty>
+			</dynamic>			
+		</sql>
+	
+    	<select id = "buyerList" resultClass="java.util.HashMap" parameterClass="map">
+    		select c.*
+    		from(select rownum rnum, a.*
+    		     from(select * 
+				      from lprod l inner join buyer b
+	       		      on(l.lprod_gu = b.buyer_lgu) 
+	       		      where b.buyer_delete = 'n'
+	       		      <include refid="searchCondition"/>) a )c
+	        <![CDATA[
+	       	where c.rnum <= #startCount#
+	       	and c.rnum >= #endCount#
+	       	]]>
+	       	order by c.rnum desc 
+	       
+	       	
+    	</select>
+    	
+    	<select id = "buyerIdInfo" parameterClass="map" resultClass="buyerVO">
+    		select * 
+    		from buyer
+    		where buyer_id = #buyer_id#
+    	</select>
+    	
+    	<select id = "inputBuyerId" parameterClass="String" resultClass="String">
+    		select SUBSTR(MAX(buyer_id), 2) + 1
+			from buyer
+			where buyer_lgu= #buyer_lgu#
+    	</select>
+    	
+    	<select id = "inputFirstBuyerId" resultClass = "String">
+    		select SUBSTR(MAX(buyer_id), 2) + 1
+			from buyer
+    	</select>
+    	
+    	<update id = "deleteBuyer" parameterClass="map">
+    		update buyer
+    		set buyer_delete = 'y'
+    		where buyer_id = #buyer_id#
+    	</update>
+    	
+    	<update id = "updateBuyer" parameterClass="buyerVO">
+    		update buyer
+    		set 
+    			buyer_name = #buyer_name#
+    			,buyer_charger = #buyer_charger#
+    			,buyer_bank = #buyer_bank#
+    			,buyer_add1 = #buyer_add1#
+    			,buyer_add2 = #buyer_add2#
+    			,buyer_comtel = #buyer_comtel#
+    			,buyer_fax = #buyer_fax#
+    			,buyer_mail = #buyer_mail#
+    	</update>
+    	
+    	<select id= "lprodInfo" resultClass="lprodVO">
+    		select * 
+    		from lprod
+    	</select>
+    	
+    	<insert id = "insertBuyer" parameterClass="buyerVO">
+    		insert into buyer(
+    			buyer_id, 
+    			buyer_name,
+    			buyer_lgu,
+    			buyer_charger,
+    			buyer_bank,
+    			buyer_add1,
+    			buyer_add2,
+    			buyer_comtel,
+    			buyer_fax,
+    			buyer_mail
+    			)values(
+    					#buyer_id#, 
+    					#buyer_name#,
+    					#buyer_lgu#,
+    					#buyer_charger#,
+    					#buyer_bank#,
+    					#buyer_add1#,
+    					#buyer_add2#,
+    					#buyer_comtel#,
+    					#buyer_fax#,
+    					#buyer_mail#)
+    	</insert>
+    
+    	<select id="totalCount" parameterClass="map" resultClass="String">
+			SELECT COUNT(BUYER_ID)
+			FROM BUYER
+			WHERE BUYER_DELETE = 'n'
+			<include refid="searchCondition"/>
+		</select>
+    </sqlMap>

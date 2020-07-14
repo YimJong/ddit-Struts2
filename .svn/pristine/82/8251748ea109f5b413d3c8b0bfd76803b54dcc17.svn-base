@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="sumnailPKG" extends="struts-default,tiles-default" namespace="/user/sumnail">
+		<action name = "sumnailList" class="kr.or.ddit.user.sumnail.controller.FreeboardListAction">
+			<result type="tiles">user/sumnail/freeboardList</result>
+		</action>
+		<action name = "sumnailView" class="kr.or.ddit.user.sumnail.controller.FreeboardViewAction">
+			<result type="tiles">user/sumnail/freeboardView</result>
+		</action>
+		<action name = "sumnailForm">
+			<result type="tiles">user/sumnail/freeboardForm</result>
+		</action>
+		<action name = "deleteSumnail" class="kr.or.ddit.user.sumnail.controller.DeleteFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+				<param name="namespace">/user/sumnail</param>
+				<param name="actionName">sumnailList</param>
+			</result>
+		</action>
+		<action name="updateSumnail" class="kr.or.ddit.user.sumnail.controller.UpdateFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/user/sumnail</param>
+					<param name="actionName">sumnailList</param>
+				</result>
+		</action>
+		<action name="sumnailReplyForm" class="kr.or.ddit.user.sumnail.controller.replyFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="tiles">user/sumnail/sumnailReplyForm</result>
+		</action>
+		<action name="replysumnailSubmit" class="kr.or.ddit.user.sumnail.controller.replyFreeboardSubmitAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/sumnail/freeboard</param>
+					<param name="actionName">sumnailList</param>
+				</result>
+		</action>
+	</package>
+	
+	
+	
+	
+	<package name="sumnailAdminPKG" extends="struts-default,tiles-default" namespace="/admin/sumnail">
+	
+		<action name = "sumnailList" class="kr.or.ddit.user.sumnail.controller.FreeboardListAction">
+			<result type="tiles">admin/sumnail/freeBoardList</result>
+		</action>
+		
+		<action name = "sumnailForm">
+			<result type="tiles">admin/sumnail/freeboardForm</result>
+		</action>
+		
+		<action name = "sumnailView" class="kr.or.ddit.user.sumnail.controller.FreeboardViewAction">
+			<result type="tiles">admin/sumnail/freeboardView</result>
+		</action>
+		
+		<action name = "deleteSumnail" class="kr.or.ddit.user.sumnail.controller.DeleteFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+			
+					<param name="namespace">/admin/sumnail</param>
+					<param name="actionName">sumnailList</param>
+			</result>
+		</action>
+		
+		<action name="updateSumnail" class="kr.or.ddit.user.sumnail.controller.UpdateFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/admin/sumnail</param>
+					<param name="actionName">sumnailList</param>
+				</result>
+		</action>
+		
+	</package>
+	
+	
+	
+	
+</struts>
+
+

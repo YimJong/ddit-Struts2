@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="referenceRoomPKG" extends="struts-default, tiles-default" namespace="/user/referenceRoom">
+		<action name="referenceRoomList" class="kr.or.ddit.user.referenceRoom.controller.ReferenceRoomListAction">
+			<result type="tiles">user/referenceRoom/referenceRoomList</result>
+		</action>
+		
+		<action name="referenceRoomView" class="kr.or.ddit.user.referenceRoom.controller.ReferenceRoomViewAction">
+			<result type="tiles">user/referenceRoom/referenceRoomView</result>
+		</action>
+		
+		<action name = "updateReferenceboardInfo" class="kr.or.ddit.user.referenceRoom.controller.UpdateReferenceRoomAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+					<param name="namespace">/user/referenceRoom</param>
+					<param name="actionName">referenceRoomList</param>
+			</result>
+		</action>
+		
+		<action name = "deleteReferenceboardInfo" class="kr.or.ddit.user.referenceRoom.controller.DeleterReferenceRoomAction">
+			<result type="chain">
+					<param name="namespace">/user/referenceRoom</param>
+					<param name="actionName">referenceRoomList</param>
+			</result>
+		</action>
+		
+		<action name="referenceboardForm">
+			<result type="tiles">user/referenceRoom/referenceRoomForm</result>
+		</action>
+		
+		<action name="referenceboardFormReply" class="kr.or.ddit.user.referenceRoom.controller.replyReferenceRoomAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="tiles">user/referenceRoom/referenceRoomFormReply</result>
+		</action>
+		
+		<action name="replyFreeBoardSubmit" class="kr.or.ddit.user.referenceRoom.controller.replyReferenceRoomSubmitAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/user/referenceRoom</param>
+					<param name="actionName">referenceRoomList</param>
+				</result>
+		</action> 
+		
+	</package>
+	
+	<package name="referenceRoomPKGAdmin" extends="struts-default, tiles-default" namespace="/admin/referenceRoom">
+		<action name="referenceRoomList" class="kr.or.ddit.user.referenceRoom.controller.ReferenceRoomListAction">
+			<result type="tiles">admin/referenceRoom/referenceRoomList</result>
+		</action>
+		
+		
+		<action name="referenceRoomView" class="kr.or.ddit.user.referenceRoom.controller.ReferenceRoomViewAction">
+			<result type="tiles">admin/referenceRoom/referenceRoomView</result>
+		</action>
+		
+		<action name = "updateReference" class="kr.or.ddit.admin.referenceRoom.controller.UpdateReferenceAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+					<param name="namespace">/admin/referenceRoom</param>
+					<param name="actionName">referenceRoomList</param>
+			</result>
+		</action>
+		
+		<action name = "deleteReferenceboardInfo" class="kr.or.ddit.user.referenceRoom.controller.DeleterReferenceRoomAction">
+			<result type="chain">
+					<param name="namespace">/admin/referenceRoom</param>
+					<param name="actionName">referenceRoomList</param>
+			</result>
+		</action>
+	
+	</package>
+</struts>    

@@ -1,0 +1,29 @@
+package kr.or.ddit.user.question.controller;
+
+import java.util.HashMap;
+import java.util.List;
+
+import kr.or.ddit.user.question.service.IQuestionService;
+import kr.or.ddit.user.question.service.QuestionServiceImpl;
+import kr.or.ddit.vo.BoardVO;
+
+import com.opensymphony.xwork2.Action;
+
+public class QuestionListAction implements Action{
+	
+	private List<BoardVO> questionList;
+
+	@Override
+	public String execute() throws Exception {
+		
+		IQuestionService service = QuestionServiceImpl.getInstance();
+		this.questionList = service.questionList(new HashMap<String, String>());
+		
+		return SUCCESS;
+	}
+
+	public List<BoardVO> getQuestionList() {
+		return questionList;
+	}
+
+}

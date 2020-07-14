@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<!-- 
+	http://localhost/StrutsToddler/user/join/loginForm.do
+	http://localhost/StrutsToddler/user/join/loginForm.do?message='회원이아닙니다'
+ -->
+<struts>
+	<package name="adminJoinPKG" extends="abstractPKG" namespace="/admin/join">
+		<action name = "adminLoginForm">
+			<interceptor-ref name="cryptoInterceptor"></interceptor-ref>
+			<result>/WEB-INF/views/admin/join/adminLoginForm.jsp</result>
+		</action>
+		
+		<action name="loginCheck" class="kr.or.ddit.admin.join.controller.LoginCheckAction">
+			<result name="loginForm" type="redirect">
+				<![CDATA[/admin/join/adminLoginForm.do?message=${message}]]>
+			</result>
+			
+			<result name ="success" type="chain">
+				<param name ="namespace">/admin/member</param>
+				<param name = "actionName">memberList</param>
+			</result>
+		</action>
+<!-- 		
+		<action name="logout" class="kr.or.ddit.join.controller.LogoutAction">
+			<result name="success" type="redirect">
+				<![CDATA[/user/join/loginForm.do?message=${message}]]>
+			</result>
+		</action> -->
+	</package>
+</struts>

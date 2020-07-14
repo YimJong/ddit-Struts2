@@ -1,0 +1,63 @@
+package kr.or.ddit.admin.question.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import sun.security.krb5.internal.crypto.CksumType;
+
+import com.ibatis.sqlmap.client.SqlMapClient;
+
+import kr.or.ddit.ibatis.factory.SqlMapClientFactory;
+import kr.or.ddit.vo.BoardVO;
+
+public class QuestionDaoImpl implements IQuestionDao{
+	SqlMapClient client = SqlMapClientFactory.getSqlMapClient();
+	private static QuestionDaoImpl dao;
+	
+	public static QuestionDaoImpl getInstance(){
+		if(dao == null){
+			dao = new QuestionDaoImpl();
+		}
+		return dao;
+	}
+
+	@Override
+	public String insertQuestion(BoardVO insertQuestion) throws Exception {
+		return (String) client.insert("question.insertQuestion",insertQuestion);
+	}
+
+	@Override
+	public List<BoardVO> getQuestionAll(Map<String, String> params)
+			throws Exception {
+		return client.queryForList("question.getQuestionAll",params);
+	}
+
+	@Override
+	public void deleteQuestion(BoardVO deleteQuestion) throws Exception {
+		client.update("question.deleteQuestion",deleteQuestion);
+	}
+
+	@Override
+	public void modifyQuestion(BoardVO boardVO) throws Exception {
+		client.update("question.modifyQuestion",boardVO);
+	}
+
+	@Override
+	public List<BoardVO> searchConditionByQuesboard(BoardVO boardVO)
+			throws Exception {
+		List<BoardVO> QuestionList  = null;
+		QuestionList = client.queryForList("question.searchConditionByQuesboard",boardVO);
+		return QuestionList;
+	}
+
+	@Override
+	public BoardVO onlyQuestion(Map<String, String> params) throws Exception {
+		return (BoardVO) client.queryForObject("question.onlyQuestion",params);
+	}
+
+	@Override
+	public String totalCount(Map<String, String> params) throws Exception {
+		return (String) client.queryForObject("question.totalCount",params);
+	}
+
+}

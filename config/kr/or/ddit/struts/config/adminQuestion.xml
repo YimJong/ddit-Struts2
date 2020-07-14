@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="adminQuestionPKG" extends="struts-default, tiles-default" namespace="/admin/question">
+		<action name="questionList" class="kr.or.ddit.admin.question.controller.QuestionListAction">
+			<result type="tiles">admin/question/questionList</result>
+		</action>
+		
+		<action name = "questionView" class="kr.or.ddit.admin.question.controller.QuestionViewAction">
+			<result type="tiles">admin/question/questionView</result>
+		</action>
+		
+		<action name="updateQuestion" class="kr.or.ddit.admin.question.controller.UpdateQuestionAction">
+			<result type="chain">
+				<param name="namespace">/admin/question</param>
+				<param name="actionName">questionList</param>
+			</result>
+		</action>
+		
+		<action name = "deleteQuestion" class="kr.or.ddit.admin.question.controller.DeleteQuestionAction">
+			<result type="chain">
+					<param name="namespace">/admin/question</param>
+					<param name="actionName">questionList</param>
+			</result>
+		</action>
+		
+		<action name="questionForm" class="kr.or.ddit.admin.question.controller.QuestionFormAction">
+			<result type="tiles">admin/question/questionForm</result>
+		</action>
+		
+		
+			<action name="insertQuestion" class="kr.or.ddit.admin.question.controller.UpdateQuestionAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/admin/question</param>
+					<param name="actionName">questionList</param>
+				</result>
+			</action>
+	</package>
+</struts>        
+   

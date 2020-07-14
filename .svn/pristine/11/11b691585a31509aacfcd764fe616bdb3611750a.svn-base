@@ -1,0 +1,130 @@
+<%@ page language="JAVA" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>자주하는 질문</title>
+<!-- 이미지 슬라이드 사이즈 조정 -->
+<style type="text/css">
+.carousel{
+   width:200px;
+    height:150px;
+    margin-left: 200px;
+}
+.carousel-inner > .item > img{
+    width:200px;
+    height:150px;
+}       
+</style>
+<script>
+$(function(){
+   // 섬머노트를 div를 활용한 textarea에 추가.
+   // http://summernote.org 활용
+    $('#board_content').summernote({
+         height: 150,
+         codemirror: {
+         theme: 'monokai'
+      }
+    });
+    
+    
+    $('#bo_title').val('${searchQuestionList.board_title}');
+    $('#mem_id').val('${searchQuestionList.board_writer}');
+    $('#board_content').summernote('code','${searchQuestionList.board_content}');
+    
+    /* 
+    
+    $('#freeboard').submit(function(){
+          $(this).attr('action', '${pageContext.request.contextPath}/user/freeboard/updateFreeboard.do');
+          $(this).append('<input type="hidden" name="board_writer" value="${LOGINUSER.mem_id}"></input>');
+          $(this).append('<input type="hidden" name="board_content" value="'+ $('#board_content').summernote('code')+'"></input>');
+          $(this).append('<input type="hidden" name="board_no" value="${searchQuestionList.board_no}"></input>');
+    });
+    
+    $('#writeBtn').click(function(){
+       location.href='${pageContext.request.contextPath}/user/freeboard/freeboardForm.tiles';
+    });
+    
+    $('#listBtn').click(function(){
+       location.href='${pageContext.request.contextPath}/user/freeboard/freeboardList.do';
+    });
+    
+    $('#deleteBtn').click(function(){
+       location.href='${pageContext.request.contextPath}/user/freeboard/deleteFreeboard.do?board_no='+${freeboardInfo.board_no};
+    });
+    */
+    
+    $('#listBtn').click(function(){
+       	location.href='${pageContext.request.contextPath}/user/question/questionList.do';
+       });
+
+    
+});
+
+
+
+
+
+</script>
+</head>
+<body>
+<form id="freeboard" class="form-horizontal" role="form" action="" method="post">
+   <div class="form-group">
+      <label class="control-label col-sm-2" for="bo_title">제목:</label>
+      <div class="col-sm-10">
+         <input type="text" class="form-control" id="bo_title" name="board_title"disabled="true" >
+      </div>
+   </div>
+   <div class="form-group">
+      <label class="control-label col-sm-2" for="bo_nickname">작성자</label>
+      <div class="col-sm-10"> 
+         <input type="text" class="form-control" id="mem_id" name="board_nickname" disabled="true" >
+      </div>
+   </div>
+   <div class="form-group">
+      <label class="control-label col-sm-2" for="bo_content">내용:</label>
+      <div class="col-sm-10"> 
+         <div id="board_content"><p></p></div>
+      </div>
+   </div>
+   <div class="form-group">
+      <label class="control-label col-sm-2" for="bo_content">첨부파일:</label>
+      <div id="myCarousel" class="carousel slide" data-ride="carousel">
+      <!-- Wrapper for slides -->
+         <div class="carousel-inner" role="listbox" style="height: 200px;">
+            <c:forEach items="${boardInfo.items }" var="itemInfo" varStatus="stat">
+               <c:if test="${stat.first }">
+                  <div class="item active">
+               </c:if>
+               <c:if test="${stat.last }">
+                  <div class="item">
+               </c:if>
+                  <img src="/files/${itemInfo.file_save_name }" alt="pic1" style="width : 230px; height : 150px;"
+                  onclick="">
+                  </div>
+            </c:forEach>
+         </div>
+      
+         <!-- Indicators -->
+         <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+            <li data-target="#myCarousel" data-slide-to="3"></li>
+         </ol>
+   
+       
+         <!-- Left and right controls -->
+         <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+         <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
+      </div>
+   </div>
+   <div class="form-group"> 
+      <div class="col-sm-offset-2 col-sm-10">
+       <button id="listBtn" type="button" class="btn btn-delete">목록</button>
+      </div>
+   </div>
+</form>
+</body>
+</html>

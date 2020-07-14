@@ -1,0 +1,30 @@
+package kr.or.ddit.user.question.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.or.ddit.user.question.dao.IQuestionDao;
+import kr.or.ddit.user.question.dao.QuestionDaoImpl;
+import kr.or.ddit.vo.BoardVO;
+
+public class QuestionServiceImpl implements IQuestionService {
+	
+	private static IQuestionService service = new QuestionServiceImpl();
+	private IQuestionDao dao;
+	
+	private QuestionServiceImpl(){
+		dao = QuestionDaoImpl.getInstance();
+	}
+	
+	public static IQuestionService getInstance(){
+		return (service == null) ? service = new QuestionServiceImpl() : service;
+	}
+	
+	@Override
+	public List<BoardVO> questionList(Map<String, String> params) {
+		List<BoardVO> questionList = null;
+		questionList = dao.questionList(params);
+		return questionList;
+	}
+
+}

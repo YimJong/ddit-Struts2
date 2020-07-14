@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="freeboardPKG" extends="abstractPKG" namespace="/user/freeboard">
+		<action name = "freeboardList" class="kr.or.ddit.user.freeboard.controller.FreeboardListAction">
+			<result type="tiles">user/freeboard/freeboardList</result>
+		</action>
+		<action name = "freeboardView" class="kr.or.ddit.user.freeboard.controller.FreeboardViewAction">
+			<result type="tiles">user/freeboard/freeboardView</result>
+		</action>
+		<action name = "freeboardForm">
+			<result type="tiles">user/freeboard/freeboardForm</result>
+		</action>
+		<action name = "deleteFreeboard" class="kr.or.ddit.user.freeboard.controller.DeleteFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+				<param name="namespace">/user/freeboard</param>
+				<param name="actionName">freeboardList</param>
+			</result>
+		</action>
+		<action name="updateFreeboard" class="kr.or.ddit.user.freeboard.controller.UpdateFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/user/freeboard</param>
+					<param name="actionName">freeboardList</param>
+				</result>
+		</action>
+		<action name="freeboardReplyForm" class="kr.or.ddit.user.freeboard.controller.replyFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="tiles">user/freeboard/freeboardReplyForm</result>
+		</action>
+		<action name="replyFreeboardSubmit" class="kr.or.ddit.user.freeboard.controller.replyFreeboardSubmitAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/user/freeboard</param>
+					<param name="actionName">freeboardList</param>
+				</result>
+		</action>
+	</package>
+	
+	
+	
+	<package name="freeboardAdminPKG" extends="struts-default,tiles-default" namespace="/admin/freeboard">
+		<action name = "freeBoardList" class="kr.or.ddit.admin.freeboard.controller.FreeboardListAction">
+			<result type="tiles">admin/freeboard/freeBoardList</result>
+		</action>
+		<action name = "freeBoardView" class="kr.or.ddit.user.freeboard.controller.FreeboardViewAction">
+			<result type="tiles">admin/freeboard/freeBoardView</result>
+		</action>
+		<!--
+		<action name = "freeBoardForm">
+			<result type="tiles">admin/freeboard/freeBoardForm</result>
+		</action>
+		-->
+		<action name = "deleteFreeBoard" class="kr.or.ddit.user.freeboard.controller.DeleteFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+			<result type="chain">
+				<param name="namespace">/admin/freeboard</param>
+				<param name="actionName">freeBoardList</param>
+			</result>
+		</action>
+		<action name="updateFreeBoard" class="kr.or.ddit.user.freeboard.controller.UpdateFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/admin/freeboard</param>
+					<param name="actionName">freeBoardList</param>
+				</result>
+		</action>
+		<action name="freeBoardReplyForm" class="kr.or.ddit.user.freeboard.controller.replyFreeboardAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="tiles">admin/freeboard/freeBoardReplyForm</result>
+		</action>
+		<action name="replyFreeBoardSubmit" class="kr.or.ddit.user.freeboard.controller.replyFreeboardSubmitAction">
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<interceptor-ref name="params"></interceptor-ref>
+				<result type="chain">
+					<param name="namespace">/admin/freeboard</param>
+				</result>
+		</action> 
+		
+	</package>
+</struts>
+
+

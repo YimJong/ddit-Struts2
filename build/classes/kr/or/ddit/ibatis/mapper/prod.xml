@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace = "prod">
+    	<typeAlias alias="prodVO" type="kr.or.ddit.vo.ProdVO"/>
+    	<typeAlias alias="lprodVO" type="kr.or.ddit.vo.LprodVO"/>
+    	<typeAlias alias="buyerVO" type="kr.or.ddit.vo.BuyerVO"/>
+    	
+    	<sql id = "selectAll">
+			SELECT * 
+			FROM PROD
+			WHERE PROD_DELETE = 'n'
+		</sql>
+		
+		<sql id = "selectBuyerID">
+			SELECT BUYER_ID
+			FROM BUYER
+			WHERE BUYER_NAME like '%'||#search_keyword#||'%'
+		</sql>
+
+		<sql id ="searchCondition">
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword" open="(" close=")">
+					<isEqual property="search_keycode" compareValue="ALL">
+						PROD_LGU LIKE '%'||#search_keyword#||'%'
+						OR PROD_NAME LIKE'%'||#search_keyword#||'%'
+						OR PROD_BUYER IN (<include refid="selectBuyerID"/>)
+					</isEqual>
+					
+					<isEqual property="search_keycode" compareValue="PRODNAME">
+						PROD_NAME LIKE '%'||#search_keyword#||'%'
+					</isEqual>
+					
+					<isEqual property="search_keycode" compareValue="PRODLGU">
+						PROD_LGU LIKE '%'||#search_keyword#||'%'
+					</isEqual>
+					
+					<isEqual property="search_keycode" compareValue="BUYERNAME">
+						PROD_BUYER IN (<include refid="selectBuyerID"/>)
+					</isEqual>
+					
+			</isNotEmpty>
+			</dynamic>
+		</sql>
+		
+		
+    	<select id = "buyerInfo" resultClass="buyerVO">
+    		select * 
+    		from buyer
+    	</select>
+    	
+    	<select id= "lprodInfo" resultClass="lprodVO">
+    		select * 
+    		from lprod
+    	</select>
+    	
+    	<select id= "prodInfo" parameterClass="map" resultClass="prodVO">
+    		select * 
+    		from prod
+    		where prod_delete = 'n'
+    		and prod_name = #prod_name#
+    	</select>
+    	
+    	<select id= "prodIdInfo" parameterClass="map" resultClass="prodVO">
+    		select * 
+    		from prod
+    		where prod_id = #prod_id#
+    	</select>
+    	
+    	<select id= "prodBuyerInfo" resultClass="prodVO">
+    		select * 
+    		from prod
+    	</select>
+    	
+    	<select id = "prodList" resultClass="prodVO">
+    		select B.* 
+			FROM (SELECT ROWNUM RNUM, A.*
+				FROM (<include refid ="selectAll"/>
+					  <include refid ="searchCondition"/> )A) B 
+			<![CDATA[
+			WHERE B.RNUM <= #startCount#
+			AND B.RNUM >= #endCount#
+			]]>
+			ORDER BY B.RNUM DESC	
+    	</select>
+    	
+    	<update id="deleteProd" parameterClass="map">
+    		update prod
+    		set prod_delete = 'y'
+    		where prod_name = #prod_name#
+    	</update>
+    	
+    	<update id="updateProd" parameterClass="prodVO">
+    		update prod
+			set 
+				prod_cost = #prod_cost#
+				,prod_price = #prod_price#
+				,prod_sale = #prod_sale#
+				,prod_outline = #prod_outline# 
+				,prod_detail = #prod_detail# 
+				,prod_qtyin = #prod_qtyin#
+				,prod_totalstock = #prod_totalstock# 
+				,prod_properstock = #prod_properstock#
+				,prod_insdate = #prod_insdate#
+			where prod_name=#prod_name#
+    	</update>
+    	
+    	<insert id = "insertProd" parameterClass="prodVO">
+    		insert into prod(
+    					prod_id,                 
+						prod_name,               
+						prod_lgu,                
+						prod_buyer,              
+						prod_cost,               
+						prod_price,              
+						prod_sale,               
+						prod_outline,            
+						prod_detail, 
+						prod_qtyin,                         
+						prod_totalstock,                   
+						prod_properstock,   
+						prod_insdate               
+    					)values(#prod_id#,
+								#prod_name#,               
+								#prod_lgu#,              
+								#prod_buyer#,             
+								#prod_cost#,               
+								#prod_price#,              
+								#prod_sale#,               
+								#prod_outline#,            
+								#prod_detail#,             
+				               	#prod_qtyin#,
+								#prod_totalstock#,                   
+								#prod_properstock#, 
+								#prod_insdate#)			 
+    	</insert>
+    	
+    	<select id="totalCount" parameterClass="map" resultClass="String">
+			SELECT COUNT(PROD_ID)
+			FROM PROD
+			WHERE prod_delete = 'n'
+			<include refid="searchCondition"/>
+		</select>
+		            
+    </sqlMap>

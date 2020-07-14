@@ -1,0 +1,34 @@
+package kr.or.ddit.user.qnaboard.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.fileupload.FileItem;
+
+import kr.or.ddit.vo.BoardVO;
+import kr.or.ddit.vo.FileItemVO;
+
+public interface IQnaboardDao {
+	
+	public String totalCount(Map<String, String> params) throws Exception;
+	
+	public List<BoardVO> qnaboardList(Map<String, String> params) throws Exception;
+	
+	public String insertQnaboard(BoardVO boardInfo, List<FileItemVO> fileList) throws Exception;
+	
+	public void insertFileitem(List<FileItemVO> fileList) throws Exception;
+	
+	public BoardVO qnaboardInfo(String board_no) throws Exception;
+	
+	public List<FileItemVO> fileListInfo(String board_no) throws Exception;
+	
+	public void updateQnaboard(Map<String, String> params) throws Exception;
+	
+	public void deleteQnaboard(String board_no) throws Exception;
+	
+	public void deleteFileitem(String board_no) throws Exception;
+	
+	public void updateBoardHit(String board_no) throws Exception;
+	
+	public void insertReplyQnaboard(BoardVO boardInfo) throws Exception;
+}
